@@ -5,237 +5,51 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
 <title>期末対策くん</title>
-
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:#f5f7fb;
-  color:#172033;
-  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif
-}
-
-button,input{
-  font:inherit
-}
-
-.app{
-  max-width:820px;
-  margin:auto;
-  padding:18px 14px 36px
-}
-
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin-bottom:14px
-}
-
-h1{
-  font-size:27px;
-  margin:0
-}
-
-.sub{
-  color:#697386;
-  font-size:13px
-}
-
-.card{
-  background:#fff;
-  border:1px solid #e5e9f0;
-  border-radius:18px;
-  padding:20px;
-  box-shadow:0 5px 20px #17203310
-}
-
-.hidden{
-  display:none!important
-}
-
-.homeGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:16px
-}
-
-.big{
-  padding:16px;
-  border:0;
-  border-radius:14px;
-  background:#172033;
-  color:white;
-  font-weight:700
-}
-
-.secondary{
-  background:#eef1f6;
-  color:#172033
-}
-
-.stats{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin:12px 0
-}
-
-.pill{
-  background:#eef1f6;
-  border-radius:999px;
-  padding:7px 11px;
-  font-size:13px
-}
-
-.progress{
-  height:9px;
-  background:#e8ecf2;
-  border-radius:99px;
-  overflow:hidden;
-  margin:12px 0 20px
-}
-
-.bar{
-  height:100%;
-  width:0;
-  background:#172033;
-  transition:.25s
-}
-
-.qnum{
-  font-size:13px;
-  color:#697386;
-  margin-bottom:7px
-}
-
-.question{
-  font-size:21px;
-  line-height:1.55;
-  font-weight:700;
-  margin-bottom:18px;
-  white-space:pre-wrap
-}
-
-.answerBox{
-  width:100%;
-  min-height:125px;
-  border:2px solid #dce2eb;
-  border-radius:14px;
-  padding:13px;
-  resize:vertical;
-  outline:none
-}
-
-.answerBox:focus{
-  border-color:#172033
-}
-
-.actions{
-  display:flex;
-  gap:10px;
-  margin-top:12px
-}
-
-.actions button{
-  flex:1;
-  padding:13px;
-  border:0;
-  border-radius:12px;
-  font-weight:700
-}
-
-.primary{
-  background:#172033;
-  color:white
-}
-
-.optionGrid{
-  display:grid;
-  gap:10px
-}
-
-.option{
-  padding:13px;
-  text-align:left;
-  border:2px solid #e0e5ed;
-  background:#fff;
-  border-radius:12px
-}
-
-.option.selected{
-  border-color:#172033;
-  background:#f1f3f7
-}
-
-.feedback{
-  margin-top:16px;
-  padding:15px;
-  border-radius:13px;
-  line-height:1.65
-}
-
-.ok{
-  background:#eaf7ee
-}
-
-.ng{
-  background:#fff0f0
-}
-
-.answer{
-  font-weight:700
-}
-
-.small{
-  font-size:12px;
-  color:#697386
-}
-
-.result{
-  text-align:center
-}
-
-.score{
-  font-size:54px;
-  font-weight:800
-}
-
-.review{
-  margin-top:14px
-}
-
-.reviewItem{
-  padding:13px 0;
-  border-top:1px solid #e5e9f0
-}
-
-.tag{
-  display:inline-block;
-  font-size:11px;
-  padding:3px 7px;
-  border-radius:999px;
-  background:#eef1f6;
-  margin-right:6px
-}
-
+body{margin:0;background:#f5f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+button,input{font:inherit}
+.app{max-width:820px;margin:auto;padding:18px 14px 36px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+h1{font-size:27px;margin:0}
+.sub{color:#697386;font-size:13px}
+.card{background:#fff;border:1px solid #e5e9f0;border-radius:18px;padding:20px;box-shadow:0 5px 20px #17203310}
+.hidden{display:none!important}
+.homeGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.big{padding:16px;border:0;border-radius:14px;background:#172033;color:white;font-weight:700}
+.secondary{background:#eef1f6;color:#172033}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.pill{background:#eef1f6;border-radius:999px;padding:7px 11px;font-size:13px}
+.progress{height:9px;background:#e8ecf2;border-radius:99px;overflow:hidden;margin:12px 0 20px}
+.bar{height:100%;width:0;background:#172033;transition:.25s}
+.qnum{font-size:13px;color:#697386;margin-bottom:7px}
+.question{font-size:21px;line-height:1.55;font-weight:700;margin-bottom:18px;white-space:pre-wrap}
+.answerBox{width:100%;min-height:125px;border:2px solid #dce2eb;border-radius:14px;padding:13px;resize:vertical;outline:none}
+.answerBox:focus{border-color:#172033}
+.actions{display:flex;gap:10px;margin-top:12px}
+.actions button{flex:1;padding:13px;border:0;border-radius:12px;font-weight:700}
+.primary{background:#172033;color:white}
+.optionGrid{display:grid;gap:10px}
+.option{padding:13px;text-align:left;border:2px solid #e0e5ed;background:#fff;border-radius:12px}
+.option.selected{border-color:#172033;background:#f1f3f7}
+.feedback{margin-top:16px;padding:15px;border-radius:13px;line-height:1.65}
+.ok{background:#eaf7ee}
+.ng{background:#fff0f0}
+.answer{font-weight:700}
+.small{font-size:12px;color:#697386}
+.result{text-align:center}
+.score{font-size:54px;font-weight:800}
+.review{margin-top:14px}
+.reviewItem{padding:13px 0;border-top:1px solid #e5e9f0}
+.tag{display:inline-block;font-size:11px;padding:3px 7px;border-radius:999px;background:#eef1f6;margin-right:6px}
 @media(max-width:560px){
-  .homeGrid{
-    grid-template-columns:1fr
-  }
-
-  .question{
-    font-size:19px
-  }
+  .homeGrid{grid-template-columns:1fr}
+  .question{font-size:19px}
 }
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <header>
@@ -254,10 +68,6 @@ h1{
 </header>
 
 
-<!-- =========================
-     ホーム
-========================= -->
-
 <section id="home" class="card">
 
   <div class="stats">
@@ -272,8 +82,6 @@ h1{
     AI採点を最優先で使い、AIに接続できない場合は自動判定に切り替えます。
   </p>
 
-
-  <!-- AI設定 -->
 
   <div
     style="margin-top:16px;padding:15px;border:1px solid #e5e9f0;border-radius:14px"
@@ -336,28 +144,15 @@ h1{
 </section>
 
 
-<!-- =========================
-     ゲーム画面
-========================= -->
-
 <section id="game" class="card hidden">
 
-  <div
-    class="qnum"
-    id="qnum"
-  ></div>
+  <div class="qnum" id="qnum"></div>
 
   <div class="progress">
-    <div
-      class="bar"
-      id="bar"
-    ></div>
+    <div class="bar" id="bar"></div>
   </div>
 
-  <div
-    class="question"
-    id="question"
-  ></div>
+  <div class="question" id="question"></div>
 
   <div id="answerArea"></div>
 
@@ -388,25 +183,16 @@ h1{
     学習を終了して結果を見る
   </button>
 
-  <div
-    id="feedback"
-    class="hidden"
-  ></div>
+  <div id="feedback" class="hidden"></div>
 
 </section>
 
-
-<!-- =========================
-     結果画面
-========================= -->
 
 <section id="result" class="card hidden">
 
   <div class="result">
 
-    <div class="sub">
-      今回の学習結果
-    </div>
+    <div class="sub">今回の学習結果</div>
 
     <div
       class="score"
@@ -445,33 +231,22 @@ h1{
 <script>
 
 /*
-=========================================================
   期末対策くん
-  GitHub Pages用・外部ライブラリ不要・1ファイル完結
-=========================================================
 
-  採点について：
+  GitHub Pages用・外部ライブラリ不要・1ファイル完結。
 
+  AI採点：
   AI採点をデフォルトONにし、
   設定したサーバー側プロキシへ
-
-    ・問題
-    ・模範解答
-    ・生徒の回答
-
-  を送信します。
+  問題・模範解答・生徒の回答を送信します。
 
   AIに接続できない場合は、
   重要語・言い換えを使ったローカル自動判定へ
   フォールバックします。
 
-  OpenAIのAPIキーはこのHTMLには絶対に入れません。
+  OpenAI APIキーはこのHTMLには絶対に入れません。
 */
 
-
-/* =====================================================
-   問題データ
-===================================================== */
 
 const Q = [
 
@@ -583,99 +358,75 @@ const Q = [
 
 {q:"レーニンの死後に実権を握ったのは誰？",a:"スターリン",type:"text",keys:[["スターリン"]]},
 
-{q:"スターリンが計画した五か年計画とは？",a:"農業の集団化（コルホーズなど）と重化学工業の強化を進める計画経済政策。",type:"text",keys:[["農業の集団化","集団化"],["コルホーズ"],["重化学工業"]]},
+{q:"スターリンが計画した五か年計画とは？",a:"農業の集団化（コルホーズなど）と重化学工業の強化を進める計画経済政策。",type:"text",keys:[["農業の集団化","集団化"],["コルホーズ"],["重化学工業"],["計画経済"]]},
 
-{q:"1919年、パリ講和会議で締結された条約は？",a:"ベルサイユ条約",type:"text",keys:[["ベルサイユ"]]},
+{q:"ヴェルサイユ条約でドイツが失ったものを説明せよ。",a:"領土の一部、植民地、軍備などを制限された。",type:"text",keys:[["領土"],["植民地"],["軍備"]]},
 
-{q:"ベルサイユ条約当時の米大統領は誰？",a:"ウィルソン",type:"text",keys:[["ウィルソン"]]},
+{q:"国際連盟が設立された目的は？",a:"国際協力によって国際平和を維持すること。",type:"text",keys:[["国際協力"],["平和"]]},
 
-{q:"国際連盟の常任理事国はどこ？",a:"イギリス・フランス・イタリア・日本",type:"text",keys:[["イギリス"],["フランス"],["イタリア"],["日本"]]},
+{q:"国際連盟の本部が置かれた都市は？",a:"ジュネーブ",type:"text",keys:[["ジュネーブ"]]},
 
-{q:"五四運動が起きたのはどこ？",a:"中国",type:"text",keys:[["中国"]]},
+{q:"国際連盟にアメリカが参加しなかった理由は？",a:"アメリカ議会が国際連盟への参加を承認しなかったため。",type:"text",keys:[["議会"],["承認"],["参加しなかった","参加しない"]]},
 
-{q:"三・一独立運動で独立宣言が読み上げられた都市はどこ？",a:"京城（現在のソウル）",type:"text",keys:[["京城","ソウル"]]},
+{q:"ワシントン会議で決められた主な内容は？",a:"海軍軍縮と中国の門戸開放・領土保全など。",type:"text",keys:[["海軍軍縮"],["門戸開放"],["中国"]]},
 
-{q:"インドで「非暴力・不服従」を唱えたのは誰？",a:"ガンジー",type:"text",keys:[["ガンジー"]]},
+{q:"四カ国条約の参加国は？",a:"アメリカ・イギリス・フランス・日本",type:"text",keys:[["アメリカ"],["イギリス"],["フランス"],["日本"]]},
 
-{q:"第一次世界大戦で日本はどの陣営で参戦した？",a:"三国協商（連合国）側",type:"text",keys:[["三国協商","連合国"]]},
+{q:"九カ国条約の主な内容は？",a:"中国の主権尊重・領土保全と門戸開放・機会均等。",type:"text",keys:[["中国"],["門戸開放"],["機会均等"]]},
 
-{q:"第一次世界大戦の混乱に乗じて日本が中国に突きつけた要求をなんという？",a:"二十一か条の要求",type:"text",keys:[["二十一か条","21か条"]]},
+{q:"日本がワシントン会議で受け入れた主力艦の保有比率は、米・英・日で？",a:"5：5：3",type:"text",keys:[["5：5：3","5:5:3","5 5 3"]]},
 
-{q:"技術の発達に伴い、文化が世界中で同じようなものになる現象をなんという？",a:"文化の画一化",type:"text",keys:[["文化の画一化","画一化"]]},
+{q:"第一次世界大戦後、ドイツで成立した共和国をなんという？",a:"ワイマール共和国",type:"text",keys:[["ワイマール"]]},
 
-{q:"神道と仏教が混ざり合う日本独自の宗教観をなんという？",a:"神仏習合",type:"text",keys:[["神仏習合"]]},
+{q:"第一次世界大戦後、イギリス・フランスなどが中東に進出した理由は？",a:"石油資源などの獲得や勢力拡大を図ったため。",type:"text",keys:[["石油"],["資源"],["勢力拡大"]]},
 
-{q:"家計が企業にもたらす影響は？",a:"消費・労働力",type:"text",keys:[["消費"],["労働力"]]},
+{q:"ムスタファ・ケマルが指導したトルコ革命の結果、何が成立した？",a:"トルコ共和国",type:"text",keys:[["トルコ共和国"]]},
 
-{q:"企業が家計にもたらす影響は？",a:"財やサービスの提供・賃金の支払い",type:"text",keys:[["財","サービス"],["賃金"]]},
+{q:"インドで非暴力・不服従運動を指導した人物は？",a:"ガンディー",type:"text",keys:[["ガンディー","ガンジー"]]},
 
-{q:"政府が国民にもたらす影響を3つ挙げよ。",a:"公共財やサービスの提供・景気の安定・所得の再分配",type:"text",keys:[["公共財","サービス"],["景気"],["所得の再分配","再分配"]]},
+{q:"中国で1919年に起きた反帝国主義運動は？",a:"五・四運動",type:"text",keys:[["五・四運動","五四運動"]]},
 
-{q:"収入と所得の違いは？",a:"収入は入ってくるお金全体、所得は収入から必要経費などを差し引いた金額。",type:"text",keys:[["収入"],["所得"],["必要経費","経費"]]},
+{q:"中国国民党と中国共産党が協力して軍閥を打倒しようとしたことをなんという？",a:"第一次国共合作",type:"text",keys:[["第一次国共合作","国共合作"]]},
 
-{q:"ケネディ米大統領が宣言した消費者の四つの権利とは？",a:"安全を求める権利・知らされる権利・選ぶ権利・意見を聞いてもらう権利",type:"text",keys:[["安全"],["知らされる","情報"],["選ぶ"],["意見"]]},
+{q:"蒋介石が南京に国民政府を成立させたのは何年？",a:"1927年",type:"text",keys:[["1927"]]},
 
-{q:"売買契約が成立するのはいつ？",a:"売る人と買う人の意思表示が一致したとき",type:"text",keys:[["売る人"],["買う人"],["一致"]]},
+{q:"満州事変が起きたのは何年？",a:"1931年",type:"text",keys:[["1931"]]},
 
-{q:"公企業とは？",a:"国や地方公共団体が運営する企業",type:"text",keys:[["国"],["地方自治体","地方公共団体"],["運営"]]},
+{q:"満州事変のきっかけとなった事件は？",a:"柳条湖事件",type:"text",keys:[["柳条湖"]]},
 
-{q:"私企業とは？",a:"民間人・民間企業が運営する企業",type:"text",keys:[["民間"],["企業"]]},
+{q:"満州事変後、日本が満州に建国した国は？",a:"満州国",type:"text",keys:[["満州国"]]},
 
-{q:"日本銀行は公私合同企業であるか？",a:"はい",type:"bool",answer:true},
+{q:"満州国の元首となった人物は？",a:"溥儀",type:"text",keys:[["溥儀"]]},
 
-{q:"まちづくり公社は公私合同企業であるか？",a:"いいえ",type:"bool",answer:false},
+{q:"日本が国際連盟を脱退したのは何年？",a:"1933年",type:"text",keys:[["1933"]]},
 
-{q:"NTTは公私合同企業であるか？",a:"はい",type:"bool",answer:true},
+{q:"二・二六事件が起きたのは何年？",a:"1936年",type:"text",keys:[["1936"]]},
 
-{q:"NHKは公私合同企業であるか？",a:"いいえ",type:"bool",answer:false},
+{q:"日中戦争が始まるきっかけとなった事件は？",a:"盧溝橋事件",type:"text",keys:[["盧溝橋"]]},
 
-{q:"JTは公私合同企業であるか？",a:"はい",type:"bool",answer:true},
+{q:"日中戦争が始まったのは何年？",a:"1937年",type:"text",keys:[["1937"]]},
 
-{q:"インフレの時、企業の売上はどうなるか？",a:"増える",type:"choice",choices:["増える","減る","必ずゼロになる"],correct:0},
+{q:"日独伊三国同盟が結ばれたのは何年？",a:"1940年",type:"text",keys:[["1940"]]},
 
-{q:"デフレの時、お金の価値はどうなるか？",a:"高くなる",type:"choice",choices:["高くなる","低くなる","変わらない"],correct:0},
+{q:"第二次世界大戦が始まったきっかけは？",a:"ドイツがポーランドに侵攻し、イギリスとフランスがドイツに宣戦布告したこと。",type:"text",keys:[["ドイツ"],["ポーランド"],["侵攻","侵略"],["イギリス"],["フランス"],["宣戦布告"]]},
 
-{q:"インフレの時、賃金はどうなるか？",a:"上昇する傾向",type:"choice",choices:["上昇する傾向","必ず下がる","必ずゼロになる"],correct:0},
+{q:"日本がアメリカ・イギリスなどに宣戦布告し、太平洋戦争が始まったきっかけは？",a:"日本軍による真珠湾攻撃などを受け、アメリカが参戦し、太平洋戦争が始まった。",type:"text",keys:[["真珠湾"],["アメリカ"],["太平洋戦争"]]},
 
-{q:"デフレの時、物価はどうなるか？",a:"安くなる",type:"choice",choices:["安くなる","高くなる","必ず変わらない"],correct:0},
+{q:"第二次世界大戦中に連合国が発表した、戦後の国際秩序についての原則を示した文書は？",a:"大西洋憲章",type:"text",keys:[["大西洋憲章"]]},
 
-{q:"金利が高い時、世の中の通貨量はどうなるか？",a:"少なくなる方向",type:"choice",choices:["少なくなる","多くなる","必ず変わらない"],correct:0},
+{q:"1945年に国際連合が成立した目的は？",a:"国際の平和と安全を維持すること。",type:"text",keys:[["国際"],["平和"],["安全"]]},
 
-{q:"金利が低い時、世の中の通貨量はどうなるか？",a:"多くなる方向",type:"choice",choices:["少なくなる","多くなる","必ずゼロになる"],correct:1},
+{q:"日本がポツダム宣言を受諾したのは何年？",a:"1945年",type:"text",keys:[["1945"]]},
 
-{q:"発券銀行とはなにか。",a:"紙幣を発行できる銀行",type:"text",keys:[["紙幣"],["発行"]]},
+{q:"日本国憲法が公布されたのは何年？",a:"1946年",type:"text",keys:[["1946"]]},
 
-{q:"日本銀行の役割である「政府の銀行」とはどういうことか？",a:"政府の資金を受け入れたり支払ったりするなど、政府の出納事務を行うこと。",type:"text",keys:[["政府"],["資金","お金"],["出納","支払","受け入"]]},
+{q:"日本国憲法が施行されたのは何年？",a:"1947年",type:"text",keys:[["1947"]]},
 
-{q:"日本銀行の役割である「銀行の銀行」とはどういうことか？",a:"金融機関の預金を受け入れたり、金融機関に資金を貸し出したりすること。",type:"text",keys:[["金融機関"],["預金","預か"],["貸し出","融資"]]},
+{q:"日本国憲法の基本原理を3つ答えよ。",a:"国民主権・基本的人権の尊重・平和主義",type:"text",keys:[["国民主権"],["基本的人権","人権"],["平和主義"]]},
 
-{q:"景気が好況なとき、実施される金融政策はなにか？",a:"金融引き締め",type:"text",keys:[["金融引き締め","引き締め"]]},
+{q:"日本国憲法第9条が定めるものは？",a:"戦争の放棄、戦力の不保持、交戦権の否認。",type:"text",keys:[["戦争の放棄","戦争放棄"],["戦力の不保持","戦力"],["交戦権の否認","交戦権"]]},
 
-{q:"景気が好況な時、日本銀行が売りオペレーションをする理由を説明せよ。",a:"国債などを売って金融機関から資金を吸収し、通貨量を減らすため。",type:"text",keys:[["売りオペ"],["資金","通貨"],["減ら","回収","吸収"]]},
-
-{q:"景気が好況な時、金融政策では金利はどうなるか？",a:"上がる",type:"text",keys:[["上が","上昇"]]},
-
-{q:"景気が不況な時、実施される金融政策はなにか？",a:"金融緩和",type:"text",keys:[["金融緩和","緩和"]]},
-
-{q:"景気が不況な時、日本銀行が「買いオペレーション」をする理由を説明せよ。",a:"国債などを買って金融機関に資金を供給し、通貨量を増やすため。",type:"text",keys:[["買いオペ"],["資金","通貨"],["供給","増や"]]},
-
-{q:"景気が不況な時、金融政策では金利はどうなるか？",a:"下がる",type:"text",keys:[["下が","低下"]]},
-
-{q:"円高の時、日本円の金利はどうなっているか？",a:"高い",type:"text",keys:[["高"]]},
-
-{q:"円安の時、日本円の金利はどうなっているか？",a:"安い",type:"text",keys:[["安","低"]]},
-
-{q:"円高は、輸出に〇〇で輸入に○○である。",a:"不利／有利",type:"text",keys:[["不利"],["有利"]]},
-
-{q:"円安は、輸出に〇〇で輸入に○○である。",a:"有利／不利",type:"text",keys:[["有利"],["不利"]]},
-
-{q:"ある通貨を別の通貨に変換することをなんという？",a:"外国為替取引",type:"text",keys:[["外国為替","為替"],["取引"]]},
-
-{q:"2025年に世界中で行われた外国為替取引のうち、一日平均の額は？",a:"約9兆5950億ドル",type:"text",keys:[["9兆5950億","9.595兆","9兆5,950億"],["ドル"]]},
-
-{q:"外国為替取引を行う際の通貨の交換比率をなんと言う？",a:"為替レート",type:"text",keys:[["為替レート","為替"]]},
-
-{q:"社会保障制度は国民の何を保証するものか？",a:"健康で文化的な最低限度の生活（生存権）",type:"text",keys:[["健康で文化的"],["最低限度"],["生存権"]]},
+{q:"日本国憲法第25条は国民の何を保証するものか？",a:"健康で文化的な最低限度の生活（生存権）",type:"text",keys:[["健康で文化的"],["最低限度"],["生存権"]]},
 
 {q:"社会保険の5つの分類を挙げよ。",a:"医療保険・年金保険・雇用保険・労災保険・介護保険",type:"text",keys:[["医療保険"],["年金保険"],["雇用保険"],["労災保険"],["介護保険"]]},
 
@@ -722,22 +473,28 @@ const Q = [
 ];
 
 
-/* =====================================================
-   初期設定
-===================================================== */
-
-document.getElementById("countPill").textContent=
-  "問題数："+Q.length;
-
-document.getElementById("aiEndpoint").value=
-  localStorage.getItem("kimitAIEndpoint")||"";
+document.getElementById("countPill").textContent="問題数："+Q.length;
 
 
 /*
-  AI採点はデフォルトON。
+  AI接続先
+*/
 
-  接続先が未設定・通信失敗時だけ
-  ローカル判定へフォールバック。
+let aiEndpointValue="";
+
+try{
+  aiEndpointValue=
+    localStorage.getItem("kimitAIEndpoint")||"";
+}catch(e){
+  aiEndpointValue="";
+}
+
+document.getElementById("aiEndpoint").value=
+  aiEndpointValue;
+
+
+/*
+  ゲーム状態
 */
 
 const AI_DEFAULT_ENABLED=true;
@@ -758,35 +515,37 @@ let wrongCount=0;
 let reviewList=[];
 
 
-/* =====================================================
-   文字列正規化
-===================================================== */
+/*
+  文字列正規化
+*/
 
 const norm=s=>
   String(s??"")
-    .toLowerCase()
-    .replace(/[！!？?。、，,・･「」『』（）()\[\]［］：:；;]/g,"")
-    .replace(/\s+/g,"")
-    .replace(/アメリカ合衆国/g,"アメリカ")
-    .replace(/イギリス連邦/g,"イギリス");
+  .toLowerCase()
+  .replace(/[！!？?。、，,・･「」『』（）()［］\[\]：:；;]/g,"")
+  .replace(/\s+/g,"")
+  .replace(/アメリカ合衆国/g,"アメリカ")
+  .replace(/イギリス連邦/g,"イギリス");
 
 
-/* =====================================================
-   シャッフル
-===================================================== */
+/*
+  シャッフル
+*/
 
 function shuffle(a){
   return [...a].sort(()=>Math.random()-.5);
 }
 
 
-/* =====================================================
-   問題デッキ
-===================================================== */
+/*
+  問題デッキ
+*/
 
 function makeDeck(){
+
   deck=shuffle(Q);
   deckPos=0;
+
 }
 
 
@@ -801,28 +560,27 @@ function drawQuestion(){
 
     makeDeck();
 
-    /*
-      デッキを一周した直後に
-      同じ問題が出るのをできるだけ避ける
-    */
-
     if(
       previous &&
       deck.length>1 &&
       deck[0]===previous
     ){
-      [deck[0],deck[1]]=
-        [deck[1],deck[0]];
+
+      [deck[0],deck[1]]
+        =[deck[1],deck[0]];
+
     }
+
   }
 
   return deck[deckPos++];
+
 }
 
 
-/* =====================================================
-   ゲーム開始
-===================================================== */
+/*
+  ゲーム開始
+*/
 
 function startGame(){
 
@@ -840,35 +598,40 @@ function startGame(){
 
   document
     .getElementById("home")
-    .classList.add("hidden");
+    .classList
+    .add("hidden");
 
   document
     .getElementById("result")
-    .classList.add("hidden");
+    .classList
+    .add("hidden");
 
   document
     .getElementById("game")
-    .classList.remove("hidden");
+    .classList
+    .remove("hidden");
 
   renderNextQuestion();
+
 }
 
 
-/* =====================================================
-   次の問題
-===================================================== */
+/*
+  次の問題
+*/
 
 function renderNextQuestion(){
 
   current=drawQuestion();
 
   render();
+
 }
 
 
-/* =====================================================
-   問題表示
-===================================================== */
+/*
+  問題表示
+*/
 
 function render(){
 
@@ -889,6 +652,7 @@ function render(){
   area.innerHTML="";
 
   selected=null;
+
   answered=false;
 
   document
@@ -904,9 +668,9 @@ function render(){
     .disabled=false;
 
 
-  /* =========================
-     選択問題
-  ========================= */
+  /*
+    選択問題
+  */
 
   if(x.type==="choice"){
 
@@ -915,11 +679,8 @@ function render(){
 
     g.className="optionGrid";
 
-
     shuffle(
-      x.choices.map(
-        (v,i)=>({v,i})
-      )
+      x.choices.map((v,i)=>({v,i}))
     ).forEach(o=>{
 
       const b=
@@ -942,18 +703,21 @@ function render(){
         );
 
         b.classList.add("selected");
+
       };
 
       g.appendChild(b);
+
     });
 
     area.appendChild(g);
+
   }
 
 
-  /* =========================
-     ○×問題
-  ========================= */
+  /*
+    ○×問題
+  */
 
   else if(x.type==="bool"){
 
@@ -962,42 +726,43 @@ function render(){
 
     g.className="optionGrid";
 
-    ["はい","いいえ"].forEach(
-      (v,i)=>{
+    ["はい","いいえ"].forEach((v,i)=>{
 
-        const b=
-          document.createElement("button");
+      const b=
+        document.createElement("button");
 
-        b.className="option";
+      b.className="option";
 
-        b.textContent=v;
+      b.textContent=v;
 
-        b.onclick=()=>{
+      b.onclick=()=>{
 
-          if(answered)return;
+        if(answered)return;
 
-          selected=i===0;
+        selected=i===0;
 
-          [
-            ...g.children
-          ].forEach(z=>
-            z.classList.remove("selected")
-          );
+        [
+          ...g.children
+        ].forEach(z=>
+          z.classList.remove("selected")
+        );
 
-          b.classList.add("selected");
-        };
+        b.classList.add("selected");
 
-        g.appendChild(b);
-      }
-    );
+      };
+
+      g.appendChild(b);
+
+    });
 
     area.appendChild(g);
+
   }
 
 
-  /* =========================
-     並べ替え問題
-  ========================= */
+  /*
+    並べ替え問題
+  */
 
   else if(x.type==="order"){
 
@@ -1008,7 +773,6 @@ function render(){
 
     const shuffled=
       shuffle(x.items);
-
 
     shuffled.forEach(v=>{
 
@@ -1021,33 +785,25 @@ function render(){
 
       b.textContent=v;
 
-
       b.onclick=()=>{
 
         if(answered)return;
 
-        selected=
-          selected||[];
-
+        selected=selected||[];
 
         if(selected.includes(v)){
 
           selected=
-            selected.filter(
-              z=>z!==v
-            );
+            selected.filter(z=>z!==v);
 
-          b.classList.remove(
-            "selected"
-          );
+          b.classList.remove("selected");
 
         }else{
 
           selected.push(v);
 
-          b.classList.add(
-            "selected"
-          );
+          b.classList.add("selected");
+
         }
 
 
@@ -1063,13 +819,15 @@ function render(){
 
           btn.textContent=
             n>=0
-              ?(n+1)+"： "+val
-              :val;
+            ?(n+1)+"： "+val
+            :val;
+
         });
+
       };
 
-
       g.appendChild(b);
+
     });
 
 
@@ -1081,16 +839,14 @@ function render(){
     note.textContent=
       "正しい順番になるようにタップしてください。もう一度タップすると解除できます。";
 
-    area.append(
-      g,
-      note
-    );
+    area.append(g,note);
+
   }
 
 
-  /* =========================
-     記述問題
-  ========================= */
+  /*
+    記述問題
+  */
 
   else{
 
@@ -1105,51 +861,42 @@ function render(){
       "ここに答えを入力…";
 
     area.appendChild(t);
+
   }
+
 }
 
 
-/* =====================================================
-   回答を文字列化
-===================================================== */
+/*
+  回答を文字列化
+*/
 
 function answerToText(x,ans){
 
-  if(x.type==="choice"){
+  if(x.type==="choice")
+    return ans===null||ans===undefined
+      ?"（未回答）"
+      :x.choices[ans];
 
-    return
-      ans===null ||
-      ans===undefined
-        ?"（未回答）"
-        :x.choices[ans];
-  }
+  if(x.type==="bool")
+    return ans===null||ans===undefined
+      ?"（未回答）"
+      :(ans?"はい":"いいえ");
 
-  if(x.type==="bool"){
+  if(x.type==="order")
+    return Array.isArray(ans)
+      ?ans.join(" → ")
+      :"（未回答）";
 
-    return
-      ans===null ||
-      ans===undefined
-        ?"（未回答）"
-        :(ans?"はい":"いいえ");
-  }
+  return String(ans??"")
+    .trim()||"（未回答）";
 
-  if(x.type==="order"){
-
-    return
-      Array.isArray(ans)
-        ?ans.join(" → ")
-        :"（未回答）";
-  }
-
-  return
-    String(ans??"").trim()
-      ||"（未回答）";
 }
 
 
-/* =====================================================
-   ローカル自動採点
-===================================================== */
+/*
+  ローカル判定
+*/
 
 function judgeLocal(x,ans){
 
@@ -1160,21 +907,13 @@ function judgeLocal(x,ans){
     return ans===x.answer;
 
   if(x.type==="order")
-    return
-      Array.isArray(ans) &&
-      ans.join("|")===
-      x.items.join("|");
-
+    return Array.isArray(ans)
+      &&
+      ans.join("|")===x.items.join("|");
 
   const s=norm(ans);
 
-  if(!s)
-    return false;
-
-
-  /*
-    模範解答そのものと一致
-  */
+  if(!s)return false;
 
   if(
     norm(x.a)===s ||
@@ -1182,70 +921,56 @@ function judgeLocal(x,ans){
       norm(x.a).includes(s) &&
       s.length>=4
     )
-  ){
+  )
     return true;
-  }
 
-
-  if(!x.keys)
-    return false;
-
+  if(!x.keys)return false;
 
   let hit=0;
 
-
-  for(
-    const group of x.keys
-  ){
+  for(const group of x.keys){
 
     if(
-      group.some(
-        k=>s.includes(norm(k))
+      group.some(k=>
+        s.includes(norm(k))
       )
-    ){
+    )
       hit++;
-    }
-  }
 
+  }
 
   const ratio=
     hit/x.keys.length;
 
+  return x.keys.length<=2
+    ?hit===x.keys.length
+    :ratio>=0.7&&hit>=3;
 
-  return
-    x.keys.length<=2
-      ?hit===x.keys.length
-      :ratio>=0.7 && hit>=3;
 }
 
 
-/* =====================================================
-   模範解答表示
-===================================================== */
+/*
+  模範解答
+*/
 
 function displayAnswer(x){
   return x.a;
 }
 
 
-/* =====================================================
-   回答処理
-===================================================== */
+/*
+  回答送信・採点
+*/
 
 async function submitAnswer(){
-
-  /*
-    すでに回答済みなら
-    次の問題へ
-  */
 
   if(answered){
 
     nextQuestion();
 
     return;
-  }
 
+  }
 
   const x=current;
 
@@ -1259,29 +984,26 @@ async function submitAnswer(){
 
     ans=selected;
 
-  }else if(
-    x.type==="order"
-  ){
+  }
+
+  else if(x.type==="order"){
 
     ans=selected||[];
 
-  }else{
+  }
+
+  else{
 
     ans=
       document
-        .getElementById("textAnswer")
-        .value;
+      .getElementById("textAnswer")
+      .value;
+
   }
 
 
   const studentText=
     answerToText(x,ans);
-
-
-  /*
-    最初はローカル判定。
-    AIが使えればAIの結果で上書き。
-  */
 
   let ok=
     judgeLocal(x,ans);
@@ -1293,20 +1015,19 @@ async function submitAnswer(){
   let aiError=false;
 
 
-  const submitBtn=
-    document.getElementById(
-      "submitBtn"
-    );
+  document
+    .getElementById("submitBtn")
+    .disabled=true;
 
-  submitBtn.disabled=true;
+  document
+    .getElementById("submitBtn")
+    .textContent=
+      "AIが採点中…";
 
-  submitBtn.textContent=
-    "AIが採点中…";
 
-
-  /* =========================
-     AI採点
-  ========================= */
+  /*
+    AI採点
+  */
 
   if(
     aiEnabled &&
@@ -1322,15 +1043,10 @@ async function submitAnswer(){
           false
         );
 
-
       if(
-        typeof ai.correct===
-        "boolean"
-      ){
-
+        typeof ai.correct==="boolean"
+      )
         ok=ai.correct;
-      }
-
 
       aiExplanation=
         ai.explanation||"";
@@ -1339,8 +1055,15 @@ async function submitAnswer(){
 
     }catch(e){
 
+      console.error(
+        "AI grading error:",
+        e
+      );
+
       aiError=true;
+
     }
+
   }
 
 
@@ -1364,12 +1087,12 @@ async function submitAnswer(){
       ans:studentText,
       explanation:aiExplanation
     });
+
   }
 
 
   /*
-    AIが使えなかった場合でも、
-    間違いには説明を表示。
+    AI説明がない場合のローカル説明
   */
 
   if(
@@ -1383,27 +1106,23 @@ async function submitAnswer(){
         studentText
       );
 
-
     reviewList[
       reviewList.length-1
     ].explanation=
       aiExplanation;
+
   }
 
 
-  /* =========================
-     結果表示
-  ========================= */
+  /*
+    フィードバック表示
+  */
 
   const fb=
-    document.getElementById(
-      "feedback"
-    );
-
+    document.getElementById("feedback");
 
   fb.className=
-    "feedback "+
-    (ok?"ok":"ng");
+    "feedback "+(ok?"ok":"ng");
 
 
   let html=
@@ -1435,6 +1154,7 @@ async function submitAnswer(){
         <b>📖 解説</b><br>
         ${escapeHtml(aiExplanation)}
       </div>`;
+
   }
 
 
@@ -1445,35 +1165,45 @@ async function submitAnswer(){
         🤖 AI採点を使用しました。
       </div>`;
 
-  }else if(aiError){
+  }
+
+  else if(aiError){
 
     html+=
       `<div class="small" style="margin-top:8px">
         AIに接続できなかったため、自動判定を使用しました。
       </div>`;
 
-  }else{
+  }
+
+  else{
 
     html+=
       `<div class="small" style="margin-top:8px">
         AI接続先が未設定のため、自動判定を使用しました。
       </div>`;
+
   }
 
 
   fb.innerHTML=html;
 
 
-  submitBtn.disabled=false;
+  document
+    .getElementById("submitBtn")
+    .disabled=false;
 
-  submitBtn.textContent=
-    "次の問題";
+  document
+    .getElementById("submitBtn")
+    .textContent=
+      "次の問題";
+
 }
 
 
-/* =====================================================
-   ローカル解説
-===================================================== */
+/*
+  ローカル解説
+*/
 
 function makeLocalExplanation(
   x,
@@ -1487,6 +1217,7 @@ function makeLocalExplanation(
 
     return
       `今回は回答がありません。正解は「${x.a}」です。模範解答の重要語を確認しましょう。`;
+
   }
 
 
@@ -1498,6 +1229,7 @@ function makeLocalExplanation(
 
     return
       `正しい答えは「${x.a}」です。あなたの回答「${studentText}」と比べて、正しい選択・順序を確認しましょう。`;
+
   }
 
 
@@ -1508,49 +1240,52 @@ function makeLocalExplanation(
 
     const missing=
       x.keys
-        .map(g=>g[0])
-        .filter(
-          k=>
-            !norm(studentText)
-              .includes(norm(k))
-        );
-
+      .map(g=>g[0])
+      .filter(k=>
+        !norm(studentText)
+          .includes(norm(k))
+      );
 
     if(missing.length){
 
       return
         `模範解答は「${x.a}」です。回答では、${missing.slice(0,3).join("・")} などの重要語が不足している可能性があります。`;
+
     }
+
   }
 
 
   return
     `模範解答は「${x.a}」です。あなたの回答「${studentText}」と見比べて、意味・重要語・条件の抜けを確認しましょう。`;
+
 }
 
 
-/* =====================================================
-   HTMLエスケープ
-===================================================== */
+/*
+  HTMLエスケープ
+*/
 
 function escapeHtml(s){
 
-  return String(s).replace(
-    /[&<>"']/g,
-    c=>({
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      '"':"&quot;",
-      "'":"&#039;"
-    }[c])
-  );
+  return String(s)
+    .replace(
+      /[&<>"']/g,
+      c=>({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      }[c])
+    );
+
 }
 
 
-/* =====================================================
-   解答を見る
-===================================================== */
+/*
+  解答を見る
+*/
 
 function skipQuestion(){
 
@@ -1559,6 +1294,7 @@ function skipQuestion(){
     renderNextQuestion();
 
     return;
+
   }
 
 
@@ -1566,7 +1302,6 @@ function skipQuestion(){
 
   const studentText=
     "（解答を表示）";
-
 
   let explanation=
     makeLocalExplanation(
@@ -1590,10 +1325,7 @@ function skipQuestion(){
 
 
   const fb=
-    document.getElementById(
-      "feedback"
-    );
-
+    document.getElementById("feedback");
 
   fb.className=
     "feedback ng";
@@ -1601,46 +1333,46 @@ function skipQuestion(){
 
   fb.innerHTML=
     `<b>解答を表示します</b>
-    <div style="margin-top:7px">
-      <span class="small">模範解答</span><br>
-      <span class="answer">
-        ${escapeHtml(x.a)}
-      </span>
-    </div>
-    <div style="margin-top:12px;padding:11px;background:#fff;border-radius:10px">
-      <b>📖 解説</b><br>
-      ${escapeHtml(explanation)}
-    </div>`;
+     <div style="margin-top:7px">
+       <span class="small">模範解答</span><br>
+       <span class="answer">
+         ${escapeHtml(x.a)}
+       </span>
+     </div>
+     <div style="margin-top:12px;padding:11px;background:#fff;border-radius:10px">
+       <b>📖 解説</b><br>
+       ${escapeHtml(explanation)}
+     </div>`;
 
 
   document
     .getElementById("submitBtn")
     .disabled=false;
 
-
   document
     .getElementById("submitBtn")
     .textContent=
       "次の問題";
+
 }
 
 
-/* =====================================================
-   次の問題
-===================================================== */
+/*
+  次の問題
+*/
 
 function nextQuestion(){
 
-  if(!answered)
-    return;
+  if(!answered)return;
 
   renderNextQuestion();
+
 }
 
 
-/* =====================================================
-   学習終了
-===================================================== */
+/*
+  終了
+*/
 
 function finishGame(){
 
@@ -1649,30 +1381,26 @@ function finishGame(){
     !answered
   ){
 
-    if(
-      totalAnswered===0
-    ){
+    if(totalAnswered===0){
 
       goHome();
 
       return;
+
     }
 
-    /*
-      現在の未回答問題は
-      学習結果には含めない
-    */
   }
 
 
   document
     .getElementById("game")
-    .classList.add("hidden");
-
+    .classList
+    .add("hidden");
 
   document
     .getElementById("result")
-    .classList.remove("hidden");
+    .classList
+    .remove("hidden");
 
 
   const rate=
@@ -1697,130 +1425,185 @@ function finishGame(){
           :rate>=.8
             ?"かなり仕上がっています。"
             :"間違えた問題を復習して、もう一周！";
+
 }
 
 
-/* =====================================================
-   復習表示
-===================================================== */
+/*
+  復習
+*/
 
 function showReview(){
 
   const r=
-    document.getElementById(
-      "review"
-    );
-
+    document.getElementById("review");
 
   r.classList.toggle("hidden");
 
 
-  if(
-    !reviewList.length
-  ){
+  if(!reviewList.length){
 
     r.innerHTML=
       "<p>間違えた問題はありません！</p>";
 
     return;
+
   }
 
 
   r.innerHTML=
     reviewList
-      .map(
-        (v,i)=>
-          `<div class="reviewItem">
-            <span class="tag">
-              復習 ${i+1}
-            </span>
+    .map(
+      (v,i)=>
+      `<div class="reviewItem">
+        <span class="tag">
+          復習 ${i+1}
+        </span>
 
-            <b>
-              ${escapeHtml(v.x.q)}
-            </b>
+        <b>
+          ${escapeHtml(v.x.q)}
+        </b>
 
-            <div style="margin-top:7px">
-              あなたの回答：
-              ${escapeHtml(v.ans||"")}
-            </div>
+        <div style="margin-top:7px">
+          あなたの回答：
+          ${escapeHtml(v.ans||"")}
+        </div>
 
-            <div style="margin-top:5px">
-              模範解答：
-              <b>
-                ${escapeHtml(v.x.a)}
-              </b>
-            </div>
+        <div style="margin-top:5px">
+          模範解答：
+          <b>
+            ${escapeHtml(v.x.a)}
+          </b>
+        </div>
 
-            <div style="margin-top:7px">
-              <b>解説：</b>
-              ${escapeHtml(
-                v.explanation ||
-                makeLocalExplanation(
-                  v.x,
-                  v.ans
-                )
-              )}
-            </div>
-          </div>`
-      )
-      .join("");
-}
+        <div style="margin-top:7px">
+          <b>解説：</b>
+          ${escapeHtml(
+            v.explanation ||
+            makeLocalExplanation(
+              v.x,
+              v.ans
+            )
+          )}
+        </div>
 
+      </div>`
+    )
+    .join("");
 
-/* =====================================================
-   AI接続先
-===================================================== */
-
-function getAIEndpoint(){
-
-  return
-    localStorage.getItem(
-      "kimitAIEndpoint"
-    )||"";
 }
 
 
 /*
-  WorkerのURLを入力した場合、
-
-    https://example.workers.dev
-
-  を
-
-    https://example.workers.dev/grade
-
-  に自動変換。
+  ==========================================
+  AI接続部分
+  ==========================================
 */
 
-function normalizeAIEndpoint(
-  value
-){
 
-  let v=
-    String(value||"")
-      .trim()
-      .replace(/\/+$/i,"");
+let aiEndpointValue="";
 
 
-  if(!v)
-    return "";
+/*
+  最初に保存済みURLを読み込む
+*/
 
+try{
 
-  if(
-    !/\/grade$/i.test(v)
-  ){
+  aiEndpointValue=
+    localStorage.getItem(
+      "kimitAIEndpoint"
+    ) || "";
 
-    v+="/grade";
-  }
+}catch(e){
 
+  aiEndpointValue="";
 
-  return v;
 }
 
 
-/* =====================================================
-   AI URL保存
-===================================================== */
+document
+  .getElementById("aiEndpoint")
+  .value=
+    aiEndpointValue;
+
+
+/*
+  URLを正規化
+
+  例：
+
+  https://example.workers.dev
+
+  ↓
+
+  https://example.workers.dev/grade
+*/
+
+function normalizeAIEndpoint(value){
+
+  let v=
+    String(value||"")
+    .trim()
+    .replace(/\/+$/i,"");
+
+
+  if(!v)return "";
+
+
+  if(!/\/grade$/i.test(v))
+    v+="/grade";
+
+
+  return v;
+
+}
+
+
+/*
+  AI URL取得
+
+  入力欄に現在値があれば、
+  それを最優先で使用する。
+
+  これにより、
+  localStorageの保存状態に問題があっても
+  現在のページでは接続できる。
+*/
+
+function getAIEndpoint(){
+
+  const input=
+    document.getElementById(
+      "aiEndpoint"
+    );
+
+
+  const fromInput=
+    input
+      ?input.value.trim()
+      :"";
+
+
+  if(fromInput)
+    return normalizeAIEndpoint(
+      fromInput
+    );
+
+
+  return
+    aiEndpointValue ||
+    localStorage.getItem(
+      "kimitAIEndpoint"
+    ) ||
+    "";
+
+}
+
+
+/*
+  AI URL保存
+*/
 
 function saveAIEndpoint(){
 
@@ -1835,45 +1618,96 @@ function saveAIEndpoint(){
     );
 
 
+  if(!input){
+
+    console.error(
+      "aiEndpoint が見つかりません"
+    );
+
+    return;
+
+  }
+
+
   const v=
     normalizeAIEndpoint(
       input.value
     );
 
 
+  /*
+    localStorageだけでなく、
+    JavaScriptの変数にも保存
+  */
+
+  aiEndpointValue=v;
+
+
   if(v){
 
-    localStorage.setItem(
-      "kimitAIEndpoint",
-      v
-    );
+    try{
+
+      localStorage.setItem(
+        "kimitAIEndpoint",
+        v
+      );
+
+    }catch(e){
+
+      console.warn(
+        "localStorageを使用できません:",
+        e
+      );
+
+    }
 
 
     input.value=v;
 
 
-    status.textContent=
-      "保存しました。AI採点は次の問題から自動で使用されます。";
+    if(status){
+
+      status.textContent=
+        "保存しました。AI採点は次の問題から自動で使用されます。";
+
+    }
+
+
+    console.log(
+      "AI endpoint saved:",
+      v
+    );
+
 
   }else{
 
-    localStorage.removeItem(
-      "kimitAIEndpoint"
-    );
+    try{
+
+      localStorage.removeItem(
+        "kimitAIEndpoint"
+      );
+
+    }catch(e){}
 
 
     input.value="";
 
 
-    status.textContent=
-      "接続先を削除しました。AI採点は自動判定にフォールバックします。";
+    if(status){
+
+      status.textContent=
+        "接続先を削除しました。AI採点は自動判定にフォールバックします。";
+
+    }
+
   }
+
 }
 
 
-/* =====================================================
-   AI採点
-===================================================== */
+/*
+  AI採点本体
+*/
 
 async function aiGrade(
   x,
@@ -1890,6 +1724,7 @@ async function aiGrade(
     throw new Error(
       "AI endpoint is not configured"
     );
+
   }
 
 
@@ -1899,17 +1734,23 @@ async function aiGrade(
 
     reference_answer:x.a,
 
-    student_answer:studentAnswer,
+    student_answer:
+      studentAnswer,
 
     question_type:
-      x.type||"text",
+      x.type || "text",
 
     instruction:
       explanationOnly
 
-        ? "模範解答を基準に、生徒の回答がなぜ誤りなのかを日本語で短く説明してください。正しい考え方も示してください。必ずJSONだけを返してください。"
+      ?
 
-        : "生徒の回答を模範解答と比較して採点してください。意味が同等ならcorrect=true。漢字・ひらがな・カタカナの違い、自然な言い換え、一般的な表記揺れは正解として扱ってください。重要な誤りや必要要素の欠落がある場合はfalse。不正解の場合は、なぜ間違いなのか・何を覚えるべきかを日本語で短く説明してください。必ずJSONだけを返してください。形式は {\"correct\":true/false,\"explanation\":\"短い日本語の説明\"} です。"
+      "模範解答を基準に、生徒の回答がなぜ誤りなのかを日本語で短く説明してください。正しい考え方も示してください。必ずJSONだけを返してください。"
+
+      :
+
+      "生徒の回答を模範解答と比較して採点してください。意味が同等ならcorrect=true。漢字・ひらがな・カタカナの違い、自然な言い換え、一般的な表記揺れは正解として扱ってください。重要な誤りや必要要素の欠落がある場合はfalse。不正解の場合は、なぜ間違いなのか・何を覚えるべきかを日本語で短く説明してください。必ずJSONだけを返してください。形式は {\"correct\":true/false,\"explanation\":\"短い日本語の説明\"} です。"
+
   };
 
 
@@ -1930,7 +1771,9 @@ async function aiGrade(
           },
 
           body:
-            JSON.stringify(payload)
+            JSON.stringify(
+              payload
+            )
         }
       );
 
@@ -1939,17 +1782,22 @@ async function aiGrade(
     throw new Error(
       "Workerへ接続できませんでした。ネットワーク・URL・CORSを確認してください。"
     );
+
   }
 
 
   /*
-    text()で一度受け取ることで、
-    HTTPエラー時の詳細を表示可能にする。
+    HTTPレスポンスを
+    いったん文字列で受け取る
   */
 
   const text=
     await r.text();
 
+
+  /*
+    HTTPエラー
+  */
 
   if(!r.ok){
 
@@ -1960,7 +1808,6 @@ async function aiGrade(
 
       const j=
         JSON.parse(text);
-
 
       detail=
         j.detail ||
@@ -1973,8 +1820,13 @@ async function aiGrade(
     throw new Error(
       `HTTP ${r.status}: ${detail}`
     );
+
   }
 
+
+  /*
+    JSONとして解析
+  */
 
   let data;
 
@@ -1989,56 +1841,103 @@ async function aiGrade(
     throw new Error(
       "WorkerからJSONではない応答が返されました。"
     );
+
   }
 
 
+  /*
+    correctがあるか確認
+  */
+
   if(
-    typeof data.correct!=="boolean"
+    typeof data.correct !==
+    "boolean"
   ){
 
     throw new Error(
       "Workerから正しい採点結果が返されませんでした。"
     );
+
   }
 
 
   return data;
+
 }
 
 
-/* =====================================================
-   AI接続テスト
-===================================================== */
+/*
+  AI接続テスト
+*/
 
 async function testAI(){
 
-  /*
-    まず現在入力されているURLを保存。
-  */
+  const input=
+    document.getElementById(
+      "aiEndpoint"
+    );
 
-  saveAIEndpoint();
-
-
-  const s=
+  const status=
     document.getElementById(
       "aiStatus"
     );
 
 
+  /*
+    入力欄が存在するか
+  */
+
+  if(!input){
+
+    if(status){
+
+      status.textContent=
+        "AI接続先の入力欄が見つかりません。";
+
+    }
+
+    return;
+
+  }
+
+
+  /*
+    現在の入力欄のURLを
+    必ず保存
+  */
+
+  saveAIEndpoint();
+
+
+  /*
+    保存後にもう一度取得
+  */
+
   const endpoint=
     getAIEndpoint();
 
 
+  console.log(
+    "AI endpoint:",
+    endpoint
+  );
+
+
+  /*
+    URLがない
+  */
+
   if(!endpoint){
 
-    s.textContent=
+    status.textContent=
       "先にAI採点用WorkerのURLを入力してください。";
 
     return;
+
   }
 
 
-  s.textContent=
+  status.textContent=
     "接続テスト中…";
 
 
@@ -2058,47 +1957,62 @@ async function testAI(){
       );
 
 
-    s.textContent=
+    if(
       x.correct===true
+    ){
 
-        ? "✅ 接続成功。AI採点を利用できます。"
+      status.textContent=
+        "✅ 接続成功。AI採点を利用できます。";
 
-        : "⚠️ 接続はできましたが、テスト採点の結果を確認してください。";
+    }else{
+
+      status.textContent=
+        "⚠️ 接続はできましたが、テスト採点の結果を確認してください。";
+
+    }
 
 
   }catch(e){
 
-    /*
-      今回はここでエラー内容を
-      そのまま画面に表示する。
-    */
+    console.error(
+      "AI connection error:",
+      e
+    );
 
-    s.textContent=
-      "❌ 接続エラー："+
-      (e.message||String(e));
+
+    status.textContent=
+      "❌ 接続エラー：" +
+      (
+        e.message ||
+        String(e)
+      );
+
   }
+
 }
 
 
-/* =====================================================
-   ホームへ戻る
-===================================================== */
+/*
+  ホーム
+*/
 
 function goHome(){
 
   document
     .getElementById("home")
-    .classList.remove("hidden");
-
+    .classList
+    .remove("hidden");
 
   document
     .getElementById("game")
-    .classList.add("hidden");
-
+    .classList
+    .add("hidden");
 
   document
     .getElementById("result")
-    .classList.add("hidden");
+    .classList
+    .add("hidden");
+
 }
 
 </script>
