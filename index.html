@@ -1,1 +1,1435 @@
-あ
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>期末対策くん</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+button,input{font:inherit}
+.app{max-width:820px;margin:auto;padding:18px 14px 36px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+h1{font-size:27px;margin:0}
+.sub{color:#697386;font-size:13px}
+.card{background:#fff;border:1px solid #e5e9f0;border-radius:18px;padding:20px;box-shadow:0 5px 20px #17203310}
+.hidden{display:none!important}
+.homeGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.big{padding:16px;border:0;border-radius:14px;background:#172033;color:white;font-weight:700}
+.secondary{background:#eef1f6;color:#172033}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.pill{background:#eef1f6;border-radius:999px;padding:7px 11px;font-size:13px}
+.progress{height:9px;background:#e8ecf2;border-radius:99px;overflow:hidden;margin:12px 0 20px}
+.bar{height:100%;width:0;background:#172033;transition:.25s}
+.qnum{font-size:13px;color:#697386;margin-bottom:7px}
+.question{font-size:21px;line-height:1.55;font-weight:700;margin-bottom:18px;white-space:pre-wrap}
+.answerBox{width:100%;min-height:125px;border:2px solid #dce2eb;border-radius:14px;padding:13px;resize:vertical;outline:none}
+.answerBox:focus{border-color:#172033}
+.actions{display:flex;gap:10px;margin-top:12px}
+.actions button{flex:1;padding:13px;border:0;border-radius:12px;font-weight:700}
+.primary{background:#172033;color:white}
+.optionGrid{display:grid;gap:10px}
+.option{padding:13px;text-align:left;border:2px solid #e0e5ed;background:#fff;border-radius:12px}
+.option.selected{border-color:#172033;background:#f1f3f7}
+.feedback{margin-top:16px;padding:15px;border-radius:13px;line-height:1.65}
+.ok{background:#eaf7ee}.ng{background:#fff0f0}
+.answer{font-weight:700}
+.small{font-size:12px;color:#697386}
+.result{text-align:center}
+.score{font-size:54px;font-weight:800}
+.review{margin-top:14px}
+.reviewItem{padding:13px 0;border-top:1px solid #e5e9f0}
+.tag{display:inline-block;font-size:11px;padding:3px 7px;border-radius:999px;background:#eef1f6;margin-right:6px}
+@media(max-width:560px){
+  .homeGrid{grid-template-columns:1fr}
+  .question{font-size:19px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div>
+    <h1>期末対策くん</h1>
+    <div class="sub">いろんな問題をランダムに解いて、期末を攻略。</div>
+  </div>
+  <button class="secondary"
+          style="border:0;border-radius:10px;padding:8px 10px"
+          onclick="goHome()">ホーム</button>
+</header>
+
+<section id="home" class="card">
+
+  <div class="stats">
+    <span class="pill" id="countPill">問題数：0</span>
+    <span class="pill">記述・選択・正誤・並べ替え</span>
+    <span class="pill">🤖 AI採点：ON</span>
+  </div>
+
+  <p>
+    問題はジャンル・形式を問わずランダムに出題され、
+    終了するまで無限に続きます。
+    AI採点を最優先で使い、AIに接続できない場合は自動判定に切り替えます。
+  </p>
+
+  <div style="margin-top:16px;padding:15px;border:1px solid #e5e9f0;border-radius:14px">
+
+    <b>🤖 AI採点の接続先</b>
+
+    <p class="small">
+      AI採点はデフォルトでONです。
+      GitHub PagesにAPIキーを置かないため、
+      Cloudflare Workersなどの安全なサーバー側プロキシのURLを設定してください。
+    </p>
+
+    <input
+      id="aiEndpoint"
+      class="answerBox"
+      style="min-height:45px;resize:none"
+      placeholder="例：https://あなたのWorker.workers.dev/grade">
+
+    <div class="actions">
+      <button class="secondary" onclick="saveAIEndpoint()">URLを保存</button>
+      <button class="secondary" onclick="testAI()">接続テスト</button>
+    </div>
+
+    <div id="aiStatus"
+         class="small"
+         style="margin-top:8px"></div>
+
+  </div>
+
+  <div class="homeGrid">
+    <button
+      class="big"
+      onclick="startGame()"
+      style="grid-column:1/-1">
+      🚀 無限に学習を開始
+    </button>
+  </div>
+
+</section>
+
+
+<section id="game" class="card hidden">
+
+  <div class="qnum" id="qnum"></div>
+
+  <div class="progress">
+    <div class="bar" id="bar"></div>
+  </div>
+
+  <div class="question" id="question"></div>
+
+  <div id="answerArea"></div>
+
+  <div class="actions">
+
+    <button
+      class="secondary"
+      onclick="skipQuestion()">
+      解答を見る
+    </button>
+
+    <button
+      class="primary"
+      id="submitBtn"
+      onclick="submitAnswer()">
+      回答する
+    </button>
+
+  </div>
+
+  <button
+    class="secondary"
+    style="width:100%;margin-top:10px;padding:11px;border:0;border-radius:12px"
+    onclick="finishGame()">
+    学習を終了して結果を見る
+  </button>
+
+  <div id="feedback" class="hidden"></div>
+
+</section>
+
+
+<section id="result" class="card hidden">
+
+  <div class="result">
+
+    <div class="sub">今回の学習結果</div>
+
+    <div class="score" id="score"></div>
+
+    <p id="resultText"></p>
+
+    <button
+      class="big"
+      onclick="startGame()">
+      もう一度、無限に続ける
+    </button>
+
+    <button
+      class="big secondary"
+      style="margin-top:10px"
+      onclick="showReview()">
+      間違えた問題を見る
+    </button>
+
+  </div>
+
+  <div id="review" class="review hidden"></div>
+
+</section>
+
+</div>
+
+
+<script>
+
+/*
+  期末対策くん
+
+  GitHub Pages用
+  外部ライブラリ不要
+  1ファイル完結
+
+  採点について：
+
+  AI採点をデフォルトONにし、
+  設定したサーバー側プロキシへ
+  問題・模範解答・回答を送信します。
+
+  AIに接続できない場合は、
+  重要語・言い換えを使った
+  ローカル自動判定へフォールバックします。
+
+  OpenAIのAPIキーはこのHTMLには絶対に入れません。
+*/
+
+
+const Q = [
+
+{q:"世界最初の第一次産業革命はいつどこで起きた？",a:"18世紀後半のイギリス",type:"text",keys:[["18世紀","18世紀後半"],["イギリス","英国"]]},
+
+{q:"以下の国々を、産業革命が起きた順に並べ替えよ。",a:"フランス → アメリカ → ドイツ → ロシア → 日本",type:"order",items:["フランス","アメリカ","ドイツ","ロシア","日本"]},
+
+{q:"19世紀後半に第二次産業革命が起きた二国を答えよ。",a:"ドイツ・アメリカ",type:"text",keys:[["ドイツ","独"],["アメリカ","米"]]},
+
+{q:"第二次産業革命で発達した産業と、その動力は？",a:"重化学工業・石油・電力",type:"text",keys:[["重化学工業"],["石油"],["電力"]]},
+
+{q:"電話を発明したのはどこの国の誰？",a:"アメリカのベル（アレクサンダー・グラハム・ベル）",type:"text",keys:[["ベル"],["アメリカ","米国"]]},
+
+{q:"電球を発明したのはどこの国の誰？",a:"アメリカのエジソン",type:"text",keys:[["エジソン"],["アメリカ","米国"]]},
+
+{q:"電動モーターを開発したのはどこの国の誰？",a:"ドイツのジーメンス",type:"text",keys:[["ジーメンス","シーメンス"],["ドイツ","独"]]},
+
+{q:"スタンダード・オイル社を創業したのはどこの国の誰？",a:"アメリカのロックフェラー",type:"text",keys:[["ロックフェラー"],["アメリカ","米国"]]},
+
+{q:"ガソリン自動車を発明したのはどこの国の誰と誰？",a:"ドイツのダイムラーとベンツ",type:"text",keys:[["ダイムラー"],["ベンツ"],["ドイツ","独"]]},
+
+{q:"産業革命で自由競争が激化し生まれた、特定分野の一法人による独占をなんという？",a:"独占資本",type:"text",keys:[["独占資本"]]},
+
+{q:"大企業同士の合併をなんという？",a:"トラスト",type:"text",keys:[["トラスト"]]},
+
+{q:"銀行を頂点とする巨大な企業グループをなんという？また、それをドイツ語でなんという？",a:"財閥・コンツェルン",type:"text",keys:[["財閥"],["コンツェルン"]]},
+
+{q:"国家と独占資本が結託し、他の国や地域を植民地化しようとする政策をなんという？",a:"帝国主義政策",type:"text",keys:[["帝国主義"]]},
+
+{q:"帝国主義政策を取った国々をなんという？",a:"列強",type:"text",keys:[["列強"]]},
+
+{q:"クリミア戦争とはどこvsどこ？また、負けたのはどこ？",a:"ロシア vs イギリス・フランス・サルディーニャ。ロシアが敗北。",type:"text",keys:[["ロシア"],["イギリス","英"],["フランス","仏"],["サルディーニャ"],["ロシアが敗北","ロシアが負け","ロシアが敗"]]},
+
+{q:"イタリアの前身とはどこ？",a:"サルディーニャ",type:"text",keys:[["サルディーニャ"]]},
+
+{q:"クリミア戦争はなぜ起きた？",a:"ロシアの黒海方面への南下政策を阻止するため。",type:"text",keys:[["ロシア"],["黒海"],["南下"],["阻止","防ぐ"]]},
+
+{q:"アフリカ縦断政策を進めていたのはどこ？",a:"イギリス",type:"text",keys:[["イギリス","英"]]},
+
+{q:"アフリカ横断政策を進めていたのはどこ？",a:"フランス",type:"text",keys:[["フランス","仏"]]},
+
+{q:"アフリカ縦断政策と横断政策がスーダンで衝突し起きた武力衝突をなんという？",a:"ファショダ事件",type:"text",keys:[["ファショダ"]]},
+
+{q:"ファショダ事件の結末は？理由も含めて答えよ。",a:"フランスがスーダンを譲り戦争は回避された。ドイツという共通の脅威を背景に英仏は協商関係を深めた。",type:"text",keys:[["フランス","仏"],["スーダン"],["譲","撤退"],["戦争回避","戦争は回避"],["ドイツ","独"],["英仏","イギリスとフランス","イギリス","フランス"]]},
+
+{q:"モロッコ事件はなぜ起きた？",a:"モロッコを植民地化したいフランスとドイツの対立・せめぎあい。",type:"text",keys:[["モロッコ"],["フランス","仏"],["ドイツ","独"]]},
+
+{q:"モロッコ事件でフランスがモロッコを得たのはなぜ？",a:"国際的な協議を通じ、ドイツの勢力拡大を各国が警戒したため。",type:"text",keys:[["フランス","仏"],["モロッコ"],["ドイツ","独"],["各国","他国"],["警戒","防"]]},
+
+{q:"オーストリアの漢字表記は？",a:"墺",type:"text",keys:[["墺"]]},
+
+{q:"バルカン問題はなぜ起きた？",a:"バルカン諸国を自国の勢力下に置きたいロシアとオーストリアが対立を深めたから。",type:"text",keys:[["ロシア","露"],["オーストリア","墺"],["バルカン"],["対立"]]},
+
+{q:"バルカン問題で露と墺が掲げた主義について説明せよ。",a:"露：パン・スラヴ主義＝スラヴ系民族の統一を目指す。墺：パン・ゲルマン主義＝国外のドイツ人を統合しようとする。",type:"text",keys:[["パン・スラヴ","パン＝スラヴ"],["スラヴ"],["パン・ゲルマン","パン＝ゲルマン"],["ドイツ人","ゲルマン"]]},
+
+{q:"イギリス・ドイツ・オーストリア・ロシア・フランス・イタリアを、①三国協商 ②三国同盟 ③三国同盟から三国協商への離脱、に分類せよ。",a:"①イギリス・フランス・ロシア ②ドイツ・オーストリア ③イタリア",type:"text",keys:[["イギリス","英"],["フランス","仏"],["ロシア","露"],["ドイツ","独"],["オーストリア","墺"],["イタリア","伊"]]},
+
+{q:"バルカン問題との繋がりと共に、サラエボ事件の経緯と、そこから第一次世界大戦の歴史について説明せよ。",a:"バルカン問題を背景にオーストリアがボスニア・ヘルツェゴビナを併合し、セルビアが反発。1914年、サラエボでオーストリア皇太子夫妻が暗殺され、オーストリアがセルビアに宣戦布告。その後、同盟関係が連鎖して第一次世界大戦が始まった。",type:"text",keys:[["バルカン"],["オーストリア","墺"],["ボスニア","ヘルツェゴビナ"],["セルビア"],["1914"],["サラエボ"],["皇太子"],["宣戦布告"],["第一次世界大戦","世界大戦"]]},
+
+{q:"フリッツ・ハーバー博士が第一次世界大戦で関与した化学兵器として知られるものは？",a:"塩素ガスなどの毒ガス（ハーバーは毒ガス戦を推進）。※窒素固定のハーバー・ボッシュ法とは別。",type:"text",keys:[["塩素ガス","毒ガス"],["ハーバー"]]},
+
+{q:"第一次世界大戦でアメリカが参戦した主な背景は？",a:"ドイツの無制限潜水艦作戦などを背景に、1917年に連合国側として参戦した。",type:"text",keys:[["ドイツ","独"],["潜水艦"],["1917"],["連合国","三国協商"]]},
+
+{q:"世界恐慌はいつ、どこで、何をきっかけに起きたか？",a:"1929年、ニューヨークの株式市場で株価が大暴落したことをきっかけに起きた。",type:"text",keys:[["1929","1929年"],["ニューヨーク"],["株価","株式"],["大暴落"]]},
+
+{q:"世界恐慌を受けてイギリスとフランスがとった「ブロック経済」を説明せよ。",a:"植民地などを含むブロック内の貿易を優遇し、ブロック外には高い関税などを課して域内市場を守る政策。",type:"text",keys:[["ブロック"],["関税"],["域内","ブロック内"],["域外","ブロック外"]]},
+
+{q:"世界恐慌を受けてフランクリン・ルーズベルト大統領が行った「ニューディール政策」を説明せよ。",a:"公共事業などを拡大し雇用を生み出すとともに、政府の介入によって景気回復を図る政策。",type:"text",keys:[["公共事業"],["雇用","仕事"],["政府"],["景気回復"]]},
+
+{q:"日本で昭和恐慌が起きた理由を説明せよ。",a:"世界恐慌による輸出減少などの影響に加え、冷害・凶作などが重なり、深刻な不況となった。",type:"text",keys:[["世界恐慌"],["輸出"],["冷害","凶作"],["不況"]]},
+
+{q:"昭和恐慌の際、積極財政や円安への誘導、金輸出の禁止などで日本を恐慌から脱出させた内閣・人物は？",a:"高橋是清（高橋是清内閣）",type:"text",keys:[["高橋是清"]]},
+
+{q:"血盟団事件の内容と首謀者は？",a:"井上日召らによる政財界要人の暗殺事件。首謀者は井上日召。",type:"text",keys:[["井上日召"],["暗殺"]]},
+
+{q:"五・一五事件で暗殺されたのは誰？",a:"犬養毅",type:"text",keys:[["犬養毅"]]},
+
+{q:"関東大震災が起きたのは何年？",a:"1923年",type:"text",keys:[["1923"]]},
+
+{q:"ラジオ放送の開始は何年？",a:"1925年",type:"text",keys:[["1925"]]},
+
+{q:"大正デモクラシーを説明せよ。",a:"世界的な民主主義の風潮を背景に、政党政治など民主的な政治を求める動き。",type:"text",keys:[["民主主義"],["政党政治"]]},
+
+{q:"第二次護憲運動とは？",a:"非政党内閣である清浦奎吾内閣に対し、政党内閣を求めた運動。",type:"text",keys:[["清浦"],["政党内閣"],["運動"]]},
+
+{q:"普通選挙法で選挙権が保証されたのは？",a:"満25歳以上の男子",type:"text",keys:[["25歳"],["男子","男性"]]},
+
+{q:"治安維持法とは？",a:"国体の変革や私有財産制度の否認を目的とする結社などを取り締まる法律。",type:"text",keys:[["国体"],["私有財産"],["結社"]]},
+
+{q:"全国水平社の活動内容は？",a:"被差別部落の解放",type:"text",keys:[["被差別部落"],["解放"]]},
+
+{q:"新婦人協会の代表者と活動内容は？",a:"平塚らいてう・市川房枝。女性の解放や参政権などを求めた。",type:"text",keys:[["平塚らいてう"],["市川房枝"],["女性"],["参政権"]]},
+
+{q:"ロシア革命の原因は？",a:"第一次世界大戦の長期化による食料不足や労働者の劣悪な労働環境など。",type:"text",keys:[["第一次世界大戦"],["食料不足","食糧不足"],["労働環境"]]},
+
+{q:"三月革命とは何か。その結果も踏まえて答えよ。",a:"ペトログラードでの女性労働者らのデモ・ストライキなどを発端に皇帝ニコライ2世が退位し、臨時政府とソビエトが成立した。",type:"text",keys:[["ペトログラード"],["女性労働者"],["ニコライ"],["退位"],["ソビエト"]]},
+
+{q:"十一月革命で政権を握ったのは誰？",a:"レーニン率いるボリシェヴィキ",type:"text",keys:[["レーニン"],["ボリシェヴィキ"]]},
+
+{q:"社会主義の理想と仕組みは？",a:"資本家による支配や格差をなくし、労働者が中心となる社会を目指す思想。社会主義体制では主要な生産手段を公有化するなどの仕組みが取られた。",type:"text",keys:[["格差"],["労働者"],["公有","国有"]]},
+
+{q:"初の社会主義国は？",a:"ソビエト・ロシア（のちのソビエト社会主義共和国連邦＝ソ連）",type:"text",keys:[["ソビエト"],["ロシア","ソ連"]]},
+
+{q:"ソ連で独裁的な一党支配を行った政党の名前は？",a:"ソ連共産党（ソ連共産党の前身を含む）",type:"text",keys:[["共産党"]]},
+
+{q:"シベリア出兵の理由は？",a:"ロシア革命後の共産主義勢力の拡大を警戒し、列強が干渉したため。",type:"text",keys:[["共産主義"],["ロシア革命"],["干渉","警戒"]]},
+
+{q:"米騒動とシベリア出兵の繋がりを答えよ。",a:"シベリア出兵を見越した米商人らによる米の買い占め・売り惜しみなどを背景に米価が上昇し、米騒動が起きた。",type:"text",keys:[["シベリア出兵"],["買い占め","売り惜しみ"],["米価"],["米騒動"]]},
+
+{q:"レーニンの死後に実権を握ったのは誰？",a:"スターリン",type:"text",keys:[["スターリン"]]},
+
+{q:"スターリンが計画した五か年計画とは？",a:"農業の集団化（コルホーズなど）と重化学工業の強化を進める計画経済政策。",type:"text",keys:[["農業の集団化","集団化"],["コルホーズ"],["重化学工業"]]},
+
+{q:"1919年、パリ講和会議で締結された条約は？",a:"ベルサイユ条約",type:"text",keys:[["ベルサイユ"]]},
+
+{q:"ベルサイユ条約当時の米大統領は誰？",a:"ウィルソン",type:"text",keys:[["ウィルソン"]]},
+
+{q:"国際連盟の常任理事国はどこ？",a:"イギリス・フランス・イタリア・日本",type:"text",keys:[["イギリス"],["フランス"],["イタリア"],["日本"]]},
+
+{q:"五四運動が起きたのはどこ？",a:"中国",type:"text",keys:[["中国"]]},
+
+{q:"三・一独立運動で独立宣言が読み上げられた都市はどこ？",a:"京城（現在のソウル）",type:"text",keys:[["京城","ソウル"]]},
+
+{q:"インドで「非暴力・不服従」を唱えたのは誰？",a:"ガンジー",type:"text",keys:[["ガンジー"]]},
+
+{q:"第一次世界大戦で日本はどの陣営で参戦した？",a:"三国協商（連合国）側",type:"text",keys:[["三国協商","連合国"]]},
+
+{q:"第一次世界大戦の混乱に乗じて日本が中国に突きつけた要求をなんという？",a:"二十一か条の要求",type:"text",keys:[["二十一か条","21か条"]]},
+
+{q:"技術の発達に伴い、文化が世界中で同じようなものになる現象をなんという？",a:"文化の画一化",type:"text",keys:[["文化の画一化","画一化"]]},
+
+{q:"神道と仏教が混ざり合う日本独自の宗教観をなんという？",a:"神仏習合",type:"text",keys:[["神仏習合"]]},
+
+{q:"家計が企業にもたらす影響は？",a:"消費・労働力",type:"text",keys:[["消費"],["労働力"]]},
+
+{q:"企業が家計にもたらす影響は？",a:"財やサービスの提供・賃金の支払い",type:"text",keys:[["財","サービス"],["賃金"]]},
+
+{q:"政府が国民にもたらす影響を3つ挙げよ。",a:"公共財やサービスの提供・景気の安定・所得の再分配",type:"text",keys:[["公共財","サービス"],["景気"],["所得の再分配","再分配"]]},
+
+{q:"収入と所得の違いは？",a:"収入は入ってくるお金全体、所得は収入から必要経費などを差し引いた金額。",type:"text",keys:[["収入"],["所得"],["必要経費","経費"]]},
+
+{q:"ケネディ米大統領が宣言した消費者の四つの権利とは？",a:"安全を求める権利・知らされる権利・選ぶ権利・意見を聞いてもらう権利",type:"text",keys:[["安全"],["知らされる","情報"],["選ぶ"],["意見"]]},
+
+{q:"売買契約が成立するのはいつ？",a:"売る人と買う人の意思表示が一致したとき",type:"text",keys:[["売る人"],["買う人"],["一致"]]},
+
+{q:"公企業とは？",a:"国や地方公共団体が運営する企業",type:"text",keys:[["国"],["地方自治体","地方公共団体"],["運営"]]},
+
+{q:"私企業とは？",a:"民間人・民間企業が運営する企業",type:"text",keys:[["民間"],["企業"]]},
+
+{q:"日本銀行は公私合同企業であるか？",a:"はい",type:"bool",answer:true},
+
+{q:"まちづくり公社は公私合同企業であるか？",a:"いいえ",type:"bool",answer:false},
+
+{q:"NTTは公私合同企業であるか？",a:"はい",type:"bool",answer:true},
+
+{q:"NHKは公私合同企業であるか？",a:"いいえ",type:"bool",answer:false},
+
+{q:"JTは公私合同企業であるか？",a:"はい",type:"bool",answer:true},
+
+{q:"インフレの時、企業の売上はどうなるか？",a:"増える",type:"choice",choices:["増える","減る","必ずゼロになる"],correct:0},
+
+{q:"デフレの時、お金の価値はどうなるか？",a:"高くなる",type:"choice",choices:["高くなる","低くなる","変わらない"],correct:0},
+
+{q:"インフレの時、賃金はどうなるか？",a:"上昇する傾向",type:"choice",choices:["上昇する傾向","必ず下がる","必ずゼロになる"],correct:0},
+
+{q:"デフレの時、物価はどうなるか？",a:"安くなる",type:"choice",choices:["安くなる","高くなる","必ず変わらない"],correct:0},
+
+{q:"金利が高い時、世の中の通貨量はどうなるか？",a:"少なくなる方向",type:"choice",choices:["少なくなる","多くなる","必ず変わらない"],correct:0},
+
+{q:"金利が低い時、世の中の通貨量はどうなるか？",a:"多くなる方向",type:"choice",choices:["少なくなる","多くなる","必ずゼロになる"],correct:1},
+
+{q:"発券銀行とはなにか。",a:"紙幣を発行できる銀行",type:"text",keys:[["紙幣"],["発行"]]},
+
+{q:"日本銀行の役割である「政府の銀行」とはどういうことか？",a:"政府の資金を受け入れたり支払ったりするなど、政府の出納事務を行うこと。",type:"text",keys:[["政府"],["資金","お金"],["出納","支払","受け入"]]},
+
+{q:"日本銀行の役割である「銀行の銀行」とはどういうことか？",a:"金融機関の預金を受け入れたり、金融機関に資金を貸し出したりすること。",type:"text",keys:[["金融機関"],["預金","預か"],["貸し出","融資"]]},
+
+{q:"景気が好況なとき、実施される金融政策はなにか？",a:"金融引き締め",type:"text",keys:[["金融引き締め","引き締め"]]},
+
+{q:"景気が好況な時、日本銀行が売りオペレーションをする理由を説明せよ。",a:"国債などを売って金融機関から資金を吸収し、通貨量を減らすため。",type:"text",keys:[["売りオペ"],["資金","通貨"],["減ら","回収","吸収"]]},
+
+{q:"景気が好況な時、金融政策では金利はどうなるか？",a:"上がる",type:"text",keys:[["上が","上昇"]]},
+
+{q:"景気が不況な時、実施される金融政策はなにか？",a:"金融緩和",type:"text",keys:[["金融緩和","緩和"]]},
+
+{q:"景気が不況な時、日本銀行が「買いオペレーション」をする理由を説明せよ。",a:"国債などを買って金融機関に資金を供給し、通貨量を増やすため。",type:"text",keys:[["買いオペ"],["資金","通貨"],["供給","増や"]]},
+
+{q:"景気が不況な時、金融政策では金利はどうなるか？",a:"下がる",type:"text",keys:[["下が","低下"]]},
+
+{q:"円高の時、日本円の金利はどうなっているか？",a:"高い",type:"text",keys:[["高"]]},
+
+{q:"円安の時、日本円の金利はどうなっているか？",a:"安い",type:"text",keys:[["安","低"]]},
+
+{q:"円高は、輸出に〇〇で輸入に○○である。",a:"不利／有利",type:"text",keys:[["不利"],["有利"]]},
+
+{q:"円安は、輸出に〇〇で輸入に○○である。",a:"有利／不利",type:"text",keys:[["有利"],["不利"]]},
+
+{q:"ある通貨を別の通貨に変換することをなんという？",a:"外国為替取引",type:"text",keys:[["外国為替","為替"],["取引"]]},
+
+{q:"2025年に世界中で行われた外国為替取引のうち、一日平均の額は？",a:"約9兆5950億ドル",type:"text",keys:[["9兆5950億","9.595兆","9兆5,950億"],["ドル"]]},
+
+{q:"外国為替取引を行う際の通貨の交換比率をなんと言う？",a:"為替レート",type:"text",keys:[["為替レート","為替"]]},
+
+{q:"社会保障制度は国民の何を保証するものか？",a:"健康で文化的な最低限度の生活（生存権）",type:"text",keys:[["健康で文化的"],["最低限度"],["生存権"]]},
+
+{q:"社会保険の5つの分類を挙げよ。",a:"医療保険・年金保険・雇用保険・労災保険・介護保険",type:"text",keys:[["医療保険"],["年金保険"],["雇用保険"],["労災保険"],["介護保険"]]},
+
+{q:"一定以上の年齢・所得に達した日本国民は、労災保険を除く全ての社会保険に加入する義務を持つ。これをなんというか？",a:"国民皆保険",type:"text",keys:[["国民皆保険"]]},
+
+{q:"社会保障制度の4つの柱は？",a:"社会保険・公衆衛生・社会福祉・公的扶助",type:"text",keys:[["社会保険"],["公衆衛生"],["社会福祉"],["公的扶助"]]},
+
+{q:"独占禁止法を運用し、不正の監視・取り締まりを行う団体の名前は何か？",a:"公正取引委員会",type:"text",keys:[["公正取引委員会"]]},
+
+{q:"独占と寡占の違いを挙げよ。",a:"独占は一つの企業、寡占は少数の企業が市場を支配する状態。",type:"text",keys:[["独占"],["一つ","1つ"],["寡占"],["少数"]]},
+
+{q:"カルテルを説明せよ。",a:"企業間で協定を結び、価格や生産量などを取り決めて競争を避けること。",type:"text",keys:[["企業間"],["協定"],["価格","生産量"],["競争を避け","競争を制限"]]},
+
+{q:"持株会社を英語で言うと何になるか？",a:"holding company（ホールディング・カンパニー）",type:"text",keys:[["holding","ホールディング"],["company","カンパニー"]]},
+
+{q:"競争において、価格を取り決める最有力企業をなんというか？",a:"プライスリーダー",type:"text",keys:[["プライスリーダー","price leader"]]},
+
+{q:"価格以外での競争をなんというか？",a:"非価格競争",type:"text",keys:[["非価格競争"]]},
+
+{q:"価格が上がると、数量が少なくなる曲線は、需要曲線か供給曲線のどちらか？",a:"需要曲線",type:"choice",choices:["需要曲線","供給曲線"],correct:0},
+
+{q:"価格が上がると、数量が多くなる曲線は、需要曲線か供給曲線のどちらか？",a:"供給曲線",type:"choice",choices:["需要曲線","供給曲線"],correct:1},
+
+{q:"需要曲線と供給曲線が釣り合う点をなんというか？",a:"均衡価格",type:"text",keys:[["均衡価格"]]},
+
+{q:"日本国民の手取りが増えた時、需要曲線はグラフ上のどの方向へ向かって移動するか？",a:"右方向（需要が増加する方向）",type:"choice",choices:["右方向","左方向","上下には移動しない"],correct:0},
+
+{q:"ある生産物が豊作の時、供給曲線はグラフ上のどの方向へ向かって移動するか？",a:"右方向",type:"choice",choices:["右方向","左方向","上下方向のみ"],correct:0},
+
+{q:"株式の所有者をなんというか？",a:"株主",type:"text",keys:[["株主"]]},
+
+{q:"株式会社が利益を株主に還元することをなんというか？",a:"配当",type:"text",keys:[["配当"]]},
+
+{q:"株式会社が株主に、一般客と比べて優遇した措置を取ることがある。これをなんというか？",a:"株主優待",type:"text",keys:[["株主優待"]]},
+
+{q:"株主が株式会社の方針を決定する最高決定機関をなんというか？",a:"株主総会",type:"text",keys:[["株主総会"]]},
+
+{q:"企業の幹部組織が正しく機能しているかを監視する会社の業務執行組織をなんというか？",a:"取締役会",type:"text",keys:[["取締役会"]]},
+
+{q:"株式はどこで買えるか？",a:"証券取引所",type:"text",keys:[["証券取引所"]]},
+
+{q:"「株主の有限責任」を説明せよ。",a:"会社が倒産しても、株主は原則として出資額を超えて負担する責任を負わない。",type:"text",keys:[["倒産"],["出資額","投資した額"],["超え","以上の負担"]]}
+
+];
+
+
+document.getElementById("countPill").textContent="問題数："+Q.length;
+
+document.getElementById("aiEndpoint").value=
+  localStorage.getItem("kimitAIEndpoint")||"";
+
+
+// AI採点はデフォルトON。
+// 接続先が未設定・通信失敗時だけローカル判定へフォールバックします。
+
+const AI_DEFAULT_ENABLED=true;
+
+let aiEnabled=AI_DEFAULT_ENABLED;
+
+let deck=[];
+let deckPos=0;
+let current=null;
+let answered=false;
+let selected=null;
+
+let totalAnswered=0;
+let score=0;
+let correctCount=0;
+let wrongCount=0;
+
+let reviewList=[];
+
+
+const norm=s=>String(s??"")
+ .toLowerCase()
+ .replace(/[！!？?。、，,・･「」『』（）()［］\[\]：:；;]/g,"")
+ .replace(/\s+/g,"")
+ .replace(/アメリカ合衆国/g,"アメリカ")
+ .replace(/イギリス連邦/g,"イギリス");
+
+
+function shuffle(a){
+  return [...a].sort(()=>Math.random()-.5);
+}
+
+
+function makeDeck(){
+
+  deck=shuffle(Q);
+
+  deckPos=0;
+
+}
+
+
+function drawQuestion(){
+
+  if(deck.length===0 || deckPos>=deck.length){
+
+    const previous=current;
+
+    makeDeck();
+
+    // デッキを一周した直後に
+    // 同じ問題が出るのをできるだけ避ける
+
+    if(previous && deck.length>1 && deck[0]===previous){
+
+      [deck[0],deck[1]]=[deck[1],deck[0]];
+
+    }
+
+  }
+
+  return deck[deckPos++];
+
+}
+
+
+function startGame(){
+
+  totalAnswered=0;
+
+  score=0;
+
+  correctCount=0;
+
+  wrongCount=0;
+
+  reviewList=[];
+
+  answered=false;
+
+  selected=null;
+
+  makeDeck();
+
+  document.getElementById("home").classList.add("hidden");
+
+  document.getElementById("result").classList.add("hidden");
+
+  document.getElementById("game").classList.remove("hidden");
+
+  renderNextQuestion();
+
+}
+
+
+function renderNextQuestion(){
+
+  current=drawQuestion();
+
+  render();
+
+}
+
+
+function render(){
+
+  const x=current;
+
+  document.getElementById("qnum").textContent=
+    `第 ${totalAnswered+1} 問　｜　正解 ${correctCount}　不正解 ${wrongCount}　｜　全 ${Q.length} 問を循環出題`;
+
+  document.getElementById("bar").style.width=
+    ((deckPos/deck.length)*100)+"%";
+
+  document.getElementById("question").textContent=x.q;
+
+  const area=document.getElementById("answerArea");
+
+  area.innerHTML="";
+
+  selected=null;
+
+  answered=false;
+
+  document.getElementById("feedback").className="hidden";
+
+  document.getElementById("submitBtn").textContent="回答する";
+
+  document.getElementById("submitBtn").disabled=false;
+
+
+  if(x.type==="choice"){
+
+    const g=document.createElement("div");
+
+    g.className="optionGrid";
+
+    shuffle(x.choices.map((v,i)=>({v,i}))).forEach(o=>{
+
+      const b=document.createElement("button");
+
+      b.className="option";
+
+      b.textContent=o.v;
+
+      b.onclick=()=>{
+
+        if(answered)return;
+
+        selected=o.i;
+
+        [...g.children].forEach(z=>
+          z.classList.remove("selected")
+        );
+
+        b.classList.add("selected");
+
+      };
+
+      g.appendChild(b);
+
+    });
+
+    area.appendChild(g);
+
+  }
+
+  else if(x.type==="bool"){
+
+    const g=document.createElement("div");
+
+    g.className="optionGrid";
+
+    ["はい","いいえ"].forEach((v,i)=>{
+
+      const b=document.createElement("button");
+
+      b.className="option";
+
+      b.textContent=v;
+
+      b.onclick=()=>{
+
+        if(answered)return;
+
+        selected=i===0;
+
+        [...g.children].forEach(z=>
+          z.classList.remove("selected")
+        );
+
+        b.classList.add("selected");
+
+      };
+
+      g.appendChild(b);
+
+    });
+
+    area.appendChild(g);
+
+  }
+
+  else if(x.type==="order"){
+
+    const g=document.createElement("div");
+
+    g.className="optionGrid";
+
+    const shuffled=shuffle(x.items);
+
+    shuffled.forEach(v=>{
+
+      const b=document.createElement("button");
+
+      b.className="option";
+
+      b.dataset.value=v;
+
+      b.textContent=v;
+
+      b.onclick=()=>{
+
+        if(answered)return;
+
+        selected=selected||[];
+
+        if(selected.includes(v)){
+
+          selected=selected.filter(z=>z!==v);
+
+          b.classList.remove("selected");
+
+        }
+
+        else{
+
+          selected.push(v);
+
+          b.classList.add("selected");
+
+        }
+
+        [...g.children].forEach(btn=>{
+
+          const val=btn.dataset.value;
+
+          const n=selected.indexOf(val);
+
+          btn.textContent=
+            n>=0?(n+1)+"： "+val:val;
+
+        });
+
+      };
+
+      g.appendChild(b);
+
+    });
+
+    const note=document.createElement("div");
+
+    note.className="small";
+
+    note.textContent=
+      "正しい順番になるようにタップしてください。もう一度タップすると解除できます。";
+
+    area.append(g,note);
+
+  }
+
+  else{
+
+    const t=document.createElement("textarea");
+
+    t.className="answerBox";
+
+    t.id="textAnswer";
+
+    t.placeholder="ここに答えを入力…";
+
+    area.appendChild(t);
+
+  }
+
+}
+
+
+function answerToText(x,ans){
+
+  if(x.type==="choice")
+    return ans===null||ans===undefined
+      ?"（未回答）"
+      :x.choices[ans];
+
+  if(x.type==="bool")
+    return ans===null||ans===undefined
+      ?"（未回答）"
+      :(ans?"はい":"いいえ");
+
+  if(x.type==="order")
+    return Array.isArray(ans)
+      ?ans.join(" → ")
+      :"（未回答）";
+
+  return String(ans??"").trim()||"（未回答）";
+
+}
+
+
+function judgeLocal(x,ans){
+
+  if(x.type==="choice")
+    return ans===x.correct;
+
+  if(x.type==="bool")
+    return ans===x.answer;
+
+  if(x.type==="order")
+    return Array.isArray(ans)
+      &&ans.join("|")===x.items.join("|");
+
+  const s=norm(ans);
+
+  if(!s)return false;
+
+  if(
+    norm(x.a)===s ||
+    (norm(x.a).includes(s)&&s.length>=4)
+  )
+    return true;
+
+  if(!x.keys)return false;
+
+  let hit=0;
+
+  for(const group of x.keys){
+
+    if(group.some(k=>
+      s.includes(norm(k))
+    ))
+      hit++;
+
+  }
+
+  const ratio=hit/x.keys.length;
+
+  return x.keys.length<=2
+    ?hit===x.keys.length
+    :ratio>=0.7&&hit>=3;
+
+}
+
+
+function displayAnswer(x){
+  return x.a;
+}
+
+
+async function submitAnswer(){
+
+  if(answered){
+    nextQuestion();
+    return;
+  }
+
+  const x=current;
+
+  let ans;
+
+  if(x.type==="choice"||x.type==="bool")
+    ans=selected;
+
+  else if(x.type==="order")
+    ans=selected||[];
+
+  else
+    ans=document.getElementById("textAnswer").value;
+
+
+  const studentText=answerToText(x,ans);
+
+  let ok=judgeLocal(x,ans);
+
+  let aiExplanation="";
+
+  let usedAI=false;
+
+  let aiError=false;
+
+
+  document.getElementById("submitBtn").disabled=true;
+
+  document.getElementById("submitBtn").textContent=
+    "AIが採点中…";
+
+
+  if(aiEnabled&&getAIEndpoint()){
+
+    try{
+
+      const ai=await aiGrade(
+        x,
+        studentText,
+        false
+      );
+
+      if(typeof ai.correct==="boolean")
+        ok=ai.correct;
+
+      aiExplanation=ai.explanation||"";
+
+      usedAI=true;
+
+    }
+
+    catch(e){
+
+      aiError=true;
+
+    }
+
+  }
+
+
+  answered=true;
+
+  totalAnswered++;
+
+
+  if(ok){
+
+    score++;
+
+    correctCount++;
+
+  }
+
+  else{
+
+    wrongCount++;
+
+    reviewList.push({
+      x,
+      ans:studentText,
+      explanation:aiExplanation
+    });
+
+  }
+
+
+  if(!ok&&!aiExplanation){
+
+    aiExplanation=
+      makeLocalExplanation(
+        x,
+        studentText
+      );
+
+    reviewList[
+      reviewList.length-1
+    ].explanation=aiExplanation;
+
+  }
+
+
+  const fb=document.getElementById("feedback");
+
+  fb.className=
+    "feedback "+(ok?"ok":"ng");
+
+  let html=
+    ok
+      ?"<b>正解！</b>"
+      :"<b>不正解</b>";
+
+
+  html+=`
+    <div style="margin-top:7px">
+      <span class="small">模範解答</span><br>
+      <span class="answer">
+        ${escapeHtml(displayAnswer(x))}
+      </span>
+    </div>
+  `;
+
+
+  html+=`
+    <div style="margin-top:9px">
+      <span class="small">あなたの回答</span><br>
+      ${escapeHtml(studentText)}
+    </div>
+  `;
+
+
+  if(!ok){
+
+    html+=`
+      <div
+        style="margin-top:12px;padding:11px;background:#fff;border-radius:10px">
+        <b>📖 解説</b><br>
+        ${escapeHtml(aiExplanation)}
+      </div>
+    `;
+
+  }
+
+
+  if(usedAI){
+
+    html+=`
+      <div class="small" style="margin-top:8px">
+        🤖 AI採点を使用しました。
+      </div>
+    `;
+
+  }
+
+  else if(aiError){
+
+    html+=`
+      <div class="small" style="margin-top:8px">
+        AIに接続できなかったため、自動判定を使用しました。
+      </div>
+    `;
+
+  }
+
+  else{
+
+    html+=`
+      <div class="small" style="margin-top:8px">
+        AI接続先が未設定のため、自動判定を使用しました。
+      </div>
+    `;
+
+  }
+
+
+  fb.innerHTML=html;
+
+
+  document.getElementById("submitBtn").disabled=false;
+
+  document.getElementById("submitBtn").textContent=
+    "次の問題";
+
+}
+
+
+function makeLocalExplanation(x,studentText){
+
+  if(
+    !studentText||
+    studentText==="（未回答）"
+  )
+
+    return `今回は回答がありません。正解は「${x.a}」です。模範解答の重要語を確認しましょう。`;
+
+
+  if(
+    x.type==="choice"||
+    x.type==="bool"||
+    x.type==="order"
+  )
+
+    return `正しい答えは「${x.a}」です。あなたの回答「${studentText}」と比べて、正しい選択・順序を確認しましょう。`;
+
+
+  if(x.keys&&x.keys.length){
+
+    const missing=
+      x.keys
+        .map(g=>g[0])
+        .filter(k=>
+          !norm(studentText).includes(norm(k))
+        );
+
+    if(missing.length)
+
+      return `模範解答は「${x.a}」です。回答では、${missing.slice(0,3).join("・")} などの重要語が不足している可能性があります。`;
+
+  }
+
+
+  return `模範解答は「${x.a}」です。あなたの回答「${studentText}」と見比べて、意味・重要語・条件の抜けを確認しましょう。`;
+
+}
+
+
+function escapeHtml(s){
+
+  return String(s).replace(
+    /[&<>"']/g,
+    c=>({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[c])
+  );
+
+}
+
+
+function skipQuestion(){
+
+  if(answered){
+
+    renderNextQuestion();
+
+    return;
+
+  }
+
+
+  const x=current;
+
+  const studentText="（解答を表示）";
+
+  let explanation=
+    makeLocalExplanation(
+      x,
+      studentText
+    );
+
+
+  answered=true;
+
+  totalAnswered++;
+
+  wrongCount++;
+
+
+  reviewList.push({
+    x,
+    ans:studentText,
+    explanation
+  });
+
+
+  const fb=document.getElementById("feedback");
+
+  fb.className="feedback ng";
+
+  fb.innerHTML=`
+    <b>解答を表示します</b>
+
+    <div style="margin-top:7px">
+      <span class="small">模範解答</span><br>
+      <span class="answer">
+        ${escapeHtml(x.a)}
+      </span>
+    </div>
+
+    <div
+      style="margin-top:12px;padding:11px;background:#fff;border-radius:10px">
+      <b>📖 解説</b><br>
+      ${escapeHtml(explanation)}
+    </div>
+  `;
+
+
+  document.getElementById("submitBtn").disabled=false;
+
+  document.getElementById("submitBtn").textContent=
+    "次の問題";
+
+}
+
+
+function nextQuestion(){
+
+  if(!answered)return;
+
+  renderNextQuestion();
+
+}
+
+
+function finishGame(){
+
+  if(!current||!answered){
+
+    if(totalAnswered===0){
+
+      goHome();
+
+      return;
+
+    }
+
+    // 現在の未回答問題は学習結果には含めない
+
+  }
+
+
+  document.getElementById("game").classList.add("hidden");
+
+  document.getElementById("result").classList.remove("hidden");
+
+
+  const rate=
+    totalAnswered
+      ?score/totalAnswered
+      :0;
+
+
+  document.getElementById("score").textContent=
+    `${score} / ${totalAnswered}`;
+
+
+  document.getElementById("resultText").textContent=
+    totalAnswered===0
+      ?"まだ回答していません。"
+      :rate===1
+        ?"全問正解！この調子です。"
+        :rate>=.8
+          ?"かなり仕上がっています。"
+          :"間違えた問題を復習して、もう一周！";
+
+}
+
+
+function showReview(){
+
+  const r=document.getElementById("review");
+
+  r.classList.toggle("hidden");
+
+
+  if(!reviewList.length){
+
+    r.innerHTML=
+      "<p>間違えた問題はありません！</p>";
+
+    return;
+
+  }
+
+
+  r.innerHTML=
+    reviewList.map((v,i)=>`
+
+      <div class="reviewItem">
+
+        <span class="tag">
+          復習 ${i+1}
+        </span>
+
+        <b>
+          ${escapeHtml(v.x.q)}
+        </b>
+
+        <div style="margin-top:7px">
+          あなたの回答：
+          ${escapeHtml(v.ans||"")}
+        </div>
+
+        <div style="margin-top:5px">
+          模範解答：
+          <b>
+            ${escapeHtml(v.x.a)}
+          </b>
+        </div>
+
+        <div style="margin-top:7px">
+          <b>解説：</b>
+          ${escapeHtml(
+            v.explanation||
+            makeLocalExplanation(v.x,v.ans)
+          )}
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+function getAIEndpoint(){
+
+  return localStorage.getItem(
+    "kimitAIEndpoint"
+  )||"";
+
+}
+
+
+function saveAIEndpoint(){
+
+  const v=
+    document
+      .getElementById("aiEndpoint")
+      .value
+      .trim()
+      .replace(/\/+$/,"");
+
+
+  if(v)
+
+    localStorage.setItem(
+      "kimitAIEndpoint",
+      v
+    );
+
+  else
+
+    localStorage.removeItem(
+      "kimitAIEndpoint"
+    );
+
+
+  document.getElementById(
+    "aiStatus"
+  ).textContent=
+    v
+      ?"保存しました。AI採点は次の問題から自動で使用されます。"
+      :"接続先を削除しました。AI採点は自動判定にフォールバックします。";
+
+}
+
+
+async function aiGrade(
+  x,
+  studentAnswer,
+  explanationOnly=false
+){
+
+  const endpoint=
+    getAIEndpoint();
+
+
+  if(!endpoint)
+
+    throw new Error(
+      "AI endpoint is not configured"
+    );
+
+
+  const payload={
+
+    question:x.q,
+
+    reference_answer:x.a,
+
+    student_answer:studentAnswer,
+
+    question_type:x.type,
+
+    instruction:
+
+      explanationOnly
+
+        ?
+
+        "模範解答を基準に、学生の回答がなぜ誤りなのかを日本語で短く説明してください。正しい考え方も示してください。JSONのみ返してください。"
+
+        :
+
+        "学生の回答を模範解答と比較して採点してください。意味が同等ならcorrect=true、表記ゆれや自然な言い換えは正解として扱ってください。重要な誤りや必要要素の欠落がある場合はfalse。correctがfalseの場合は、なぜ間違いなのか・何を覚えるべきかを日本語で短く説明してください。JSONのみ返してください。返却形式は {\"correct\":true/false,\"explanation\":\"日本語の短い説明\" } です。"
+
+  };
+
+
+  const r=
+    await fetch(
+      endpoint,
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(payload)
+      }
+    );
+
+
+  if(!r.ok)
+
+    throw new Error(
+      "AI endpoint error"
+    );
+
+
+  const data=
+    await r.json();
+
+
+  return data;
+
+}
+
+
+async function testAI(){
+
+  saveAIEndpoint();
+
+  const s=
+    document.getElementById(
+      "aiStatus"
+    );
+
+
+  if(!getAIEndpoint()){
+
+    s.textContent=
+      "先にAI採点用WorkerのURLを入力してください。";
+
+    return;
+
+  }
+
+
+  s.textContent=
+    "接続テスト中…";
+
+
+  try{
+
+    const x=
+      await aiGrade(
+        {
+          q:"テスト：日本の首都は？",
+          a:"東京",
+          type:"text"
+        },
+        "東京です",
+        false
+      );
+
+
+    s.textContent=
+      typeof x.correct==="boolean"
+        ?"接続成功。AI採点は自動で使われます。"
+        :"接続はできましたが、応答形式を確認してください。";
+
+  }
+
+  catch(e){
+
+    s.textContent=
+      "接続できませんでした。WorkerのURL・CORS・APIキー設定を確認してください。";
+
+  }
+
+}
+
+
+function goHome(){
+
+  document.getElementById("home")
+    .classList.remove("hidden");
+
+  document.getElementById("game")
+    .classList.add("hidden");
+
+  document.getElementById("result")
+    .classList.add("hidden");
+
+}
+
+</script>
+</body>
+</html>
