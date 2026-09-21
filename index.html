@@ -1415,9 +1415,97 @@ async function aiGrade(
 }
 
 
-async function testAI(){
-
+async function testAI(async function testAI() {
   saveAIEndpoint();
+
+  const s =
+    document.getElementById("aiStatus");
+
+  const endpoint = getAIEndpoint();
+
+  if (!endpoint) {
+    s.textContent =
+      "先にAI採点用WorkerのURLを入力してください。";
+    return;
+  }
+
+  s.textContent =
+    "接続テスト中…";
+
+  try {
+    const x = await aiGrade(
+      {
+        q: "テスト：日本の首都は？",
+        a: "東京",
+        type: "text"
+      },
+      "東京です",
+      false
+    );
+
+    if (typeof x.correct === "boolean") {
+      s.textContent =
+        "✅ 接続成功。AI採点を利用できます。";
+    } else {
+      s.textContent =
+        "⚠️ 接続はできましたが、AIの応答形式を確認してください。";
+    }
+
+  } catch (e) {
+
+    /*
+     * 今回はここで本当のエラーを表示する
+     */
+    s.textContent =
+      "❌ 接続エラー：" +
+      (e.message || String(e));
+  }
+}){
+
+  saveAIEndpoint(function saveAIEndpoint() {
+  let v =
+    document
+      .getElementById("aiEndpoint")
+      .value
+      .trim();
+
+  /*
+   * URL末尾の / を削除
+   */
+  v = v.replace(/\/+$/, "");
+
+  /*
+   * /grade が付いていなければ自動追加
+   */
+  if (
+    v &&
+    !v.endsWith("/grade")
+  ) {
+    v += "/grade";
+  }
+
+  if (v) {
+    localStorage.setItem(
+      "kimitAIEndpoint",
+      v
+    );
+  } else {
+    localStorage.removeItem(
+      "kimitAIEndpoint"
+    );
+  }
+
+  document.getElementById(
+    "aiEndpoint"
+  ).value = v;
+
+  document.getElementById(
+    "aiStatus"
+  ).textContent =
+    v
+      ? "保存しました。"
+      : "AI採点の接続先を削除しました。";
+});
 
   const s=
     document.getElementById(
@@ -1425,7 +1513,13 @@ async function testAI(){
     );
 
 
-  if(!getAIEndpoint()){
+  if(!getAIEndpoint(function getAIEndpoint() {
+  return (
+    localStorage.getItem(
+      "kimitAIEndpoint"
+    ) || ""
+  );
+})){
 
     s.textContent=
       "先にAI採点用WorkerのURLを入力してください。";
