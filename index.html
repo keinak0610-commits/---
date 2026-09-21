@@ -867,11 +867,64 @@ async function submitAnswer(){
 
     try{
 
-      const ai=await aiGrade(
-        x,
-        studentText,
-        false
-      );
+      const ai=await aiGrade(async function aiGrade(x, studentAnswer, explanationOnly = false) {
+  const endpoint = getAIEndpoint();
+
+  if (!endpoint) {
+    throw new Error("AI endpoint is not configured");
+  }
+
+  const payload = {
+    question: x.q,
+
+    reference_answer: x.a,
+
+    student_answer: studentAnswer,
+
+    question_type: x.type || "text",
+
+    instruction: explanationOnly
+      ? "模範解答を基準に、生徒の回答がなぜ誤りなのかを日本語で短く説明してください。JSONのみ返してください。"
+      : "生徒の回答を模範解答と比較して採点してください。意味が同等ならcorrect=true。表記揺れや自然な言い換えは正解として扱ってください。重要な誤りや必要要素の欠落がある場合はfalse。不正解なら、なぜ間違いなのか・何を覚えるべきかを日本語で短く説明してください。必ずJSONだけを返してください。"
+  };
+
+  const r = await fetch(
+    endpoint,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify(payload)
+    }
+  );
+
+  /*
+   * ここが今回の重要な修正
+   *
+   * Workerから返ってきた本当のエラーを
+   * そのまま取得する。
+   */
+  if (!r.ok) {
+    const detail = await r.text();
+
+    throw new Error(
+      `HTTP ${r.status}: ${detail}`
+    );
+  }
+
+  const data = await r.json();
+
+  if (typeof data.correct !== "boolean") {
+    throw new Error(
+      "AIから正しい採点結果が返されませんでした。"
+    );
+  }
+
+  return data;
+});
 
       if(typeof ai.correct==="boolean")
         ok=ai.correct;
