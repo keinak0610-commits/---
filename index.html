@@ -476,22 +476,6 @@ const Q = [
 document.getElementById("countPill").textContent="問題数："+Q.length;
 
 
-/*
-  AI接続先
-*/
-
-let aiEndpointValue="";
-
-try{
-  aiEndpointValue=
-    localStorage.getItem("kimitAIEndpoint")||"";
-}catch(e){
-  aiEndpointValue="";
-}
-
-document.getElementById("aiEndpoint").value=
-  aiEndpointValue;
-
 
 /*
   ゲーム状態
@@ -1493,210 +1477,122 @@ function showReview(){
 
 }
 
+<script>
 
-/*
-  ==========================================
-  AI接続部分
-  ==========================================
-*/
-
-
-let aiEndpointValue="";
+/* =========================================================
+   期末対策くん
+   AI採点対応・GitHub Pages用
+   ========================================================= */
 
 
-/*
-  最初に保存済みURLを読み込む
-*/
+/* =========================================================
+   AI採点設定
+   ========================================================= */
 
-try{
+const AI_DEFAULT_ENABLED = true;
 
-  aiEndpointValue=
-    localStorage.getItem(
-      "kimitAIEndpoint"
-    ) || "";
+let aiEnabled = AI_DEFAULT_ENABLED;
 
-}catch(e){
 
-  aiEndpointValue="";
+/* =========================================================
+   AI Worker URL
+   ========================================================= */
 
+function getAIEndpoint() {
+  const value = localStorage.getItem("kimitAIEndpoint");
+
+  if (!value) {
+    return "";
+  }
+
+  return value.trim();
 }
 
 
-document
-  .getElementById("aiEndpoint")
-  .value=
-    aiEndpointValue;
+/* =========================================================
+   AI Worker URL 保存
+   ========================================================= */
+
+function saveAIEndpoint() {
+
+  const input =
+    document.getElementById("aiEndpoint");
+
+  const status =
+    document.getElementById("aiStatus");
 
 
-/*
-  URLを正規化
-
-  例：
-
-  https://example.workers.dev
-
-  ↓
-
-  https://example.workers.dev/grade
-*/
-
-function normalizeAIEndpoint(value){
-
-  let v=
-    String(value||"")
-    .trim()
-    .replace(/\/+$/i,"");
-
-
-  if(!v)return "";
-
-
-  if(!/\/grade$/i.test(v))
-    v+="/grade";
-
-
-  return v;
-
-}
-
-
-/*
-  AI URL取得
-
-  入力欄に現在値があれば、
-  それを最優先で使用する。
-
-  これにより、
-  localStorageの保存状態に問題があっても
-  現在のページでは接続できる。
-*/
-
-function getAIEndpoint(){
-
-  const input=
-    document.getElementById(
-      "aiEndpoint"
-    );
-
-
-  const fromInput=
-    input
-      ?input.value.trim()
-      :"";
-
-
-  if(fromInput)
-    return normalizeAIEndpoint(
-      fromInput
-    );
-
-
-  return
-    aiEndpointValue ||
-    localStorage.getItem(
-      "kimitAIEndpoint"
-    ) ||
-    "";
-
-}
-
-
-/*
-  AI URL保存
-*/
-
-function saveAIEndpoint(){
-
-  const input=
-    document.getElementById(
-      "aiEndpoint"
-    );
-
-  const status=
-    document.getElementById(
-      "aiStatus"
-    );
-
-
-  if(!input){
+  if (!input) {
 
     console.error(
-      "aiEndpoint が見つかりません"
+      "aiEndpoint が見つかりません。"
     );
 
     return;
+  }
+
+
+  let url =
+    input.value.trim();
+
+
+  /*
+    最後の / を削除
+  */
+
+  url =
+    url.replace(/\/+$/, "");
+
+
+  /*
+    /grade がなければ自動追加
+  */
+
+  if (
+    url &&
+    !url.endsWith("/grade")
+  ) {
+
+    url += "/grade";
 
   }
 
 
-  const v=
-    normalizeAIEndpoint(
-      input.value
-    );
-
-
   /*
-    localStorageだけでなく、
-    JavaScriptの変数にも保存
+    保存
   */
 
-  aiEndpointValue=v;
+  if (url) {
 
+    localStorage.setItem(
+      "kimitAIEndpoint",
+      url
+    );
 
-  if(v){
+    input.value = url;
 
-    try{
+    if (status) {
 
-      localStorage.setItem(
-        "kimitAIEndpoint",
-        v
-      );
-
-    }catch(e){
-
-      console.warn(
-        "localStorageを使用できません:",
-        e
-      );
+      status.textContent =
+        "保存しました。";
 
     }
-
-
-    input.value=v;
-
-
-    if(status){
-
-      status.textContent=
-        "保存しました。AI採点は次の問題から自動で使用されます。";
-
-    }
-
 
     console.log(
       "AI endpoint saved:",
-      v
+      url
     );
 
+  } else {
 
-  }else{
+    localStorage.removeItem(
+      "kimitAIEndpoint"
+    );
 
-    try{
+    if (status) {
 
-      localStorage.removeItem(
-        "kimitAIEndpoint"
-      );
-
-    }catch(e){}
-
-
-    input.value="";
-
-
-    if(status){
-
-      status.textContent=
-        "接続先を削除しました。AI採点は自動判定にフォールバックします。";
+      status.textContent =
+        "AI採点の接続先を削除しました。";
 
     }
 
@@ -1705,21 +1601,21 @@ function saveAIEndpoint(){
 }
 
 
-/*
-  AI採点本体
-*/
+/* =========================================================
+   AI採点
+   ========================================================= */
 
 async function aiGrade(
-  x,
+  question,
   studentAnswer,
-  explanationOnly=false
-){
+  explanationOnly = false
+) {
 
-  const endpoint=
+  const endpoint =
     getAIEndpoint();
 
 
-  if(!endpoint){
+  if (!endpoint) {
 
     throw new Error(
       "AI endpoint is not configured"
@@ -1728,134 +1624,148 @@ async function aiGrade(
   }
 
 
-  const payload={
+  const payload = {
 
-    question:x.q,
+    question:
+      question.q,
 
-    reference_answer:x.a,
+    reference_answer:
+      question.a,
 
     student_answer:
       studentAnswer,
 
     question_type:
-      x.type || "text",
+      question.type || "text",
 
     instruction:
       explanationOnly
 
-      ?
+        ?
 
-      "模範解答を基準に、生徒の回答がなぜ誤りなのかを日本語で短く説明してください。正しい考え方も示してください。必ずJSONだけを返してください。"
+`模範解答を基準に、生徒の回答がなぜ誤りなのかを日本語で短く説明してください。
+正しい考え方も説明してください。
+必ずJSONのみを返してください。
+形式：
+{"correct":false,"explanation":"説明"}`
 
-      :
+        :
 
-      "生徒の回答を模範解答と比較して採点してください。意味が同等ならcorrect=true。漢字・ひらがな・カタカナの違い、自然な言い換え、一般的な表記揺れは正解として扱ってください。重要な誤りや必要要素の欠落がある場合はfalse。不正解の場合は、なぜ間違いなのか・何を覚えるべきかを日本語で短く説明してください。必ずJSONだけを返してください。形式は {\"correct\":true/false,\"explanation\":\"短い日本語の説明\"} です。"
+`あなたは日本の中学生・高校生向けの歴史・公民の先生です。
+
+生徒の回答を模範解答と比較して採点してください。
+
+採点ルール：
+1. 意味が同じなら正解。
+2. 漢字・ひらがな・カタカナの違いは正解。
+3. 自然な言い換えは正解。
+4. 歴史上の人物名・事件名・制度名などの明らかな表記揺れは正解。
+5. 問題が要求している重要な内容が不足している場合は不正解。
+6. 一部だけ正しい場合、問題の答えとして不十分なら不正解。
+7. 必要以上に厳しく採点しない。
+8. 不正解の場合は、何が違うのか、何を覚えるべきなのかを日本語で短く説明する。
+9. 正解の場合も必要なら簡単な補足説明をする。
+
+必ずJSONだけを返してください。
+JSON以外の文章は絶対に返さないでください。
+
+形式：
+{"correct":true,"explanation":"短い説明"}`
 
   };
 
 
-  let r;
+  console.log(
+    "AI request:",
+    payload
+  );
 
 
-  try{
+  const response =
+    await fetch(
+      endpoint,
+      {
+        method: "POST",
 
-    r=
-      await fetch(
-        endpoint,
-        {
-          method:"POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
 
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
+        body:
+          JSON.stringify(payload)
+      }
+    );
 
-          body:
-            JSON.stringify(
-              payload
-            )
-        }
-      );
 
-  }catch(e){
+  /*
+    HTTPエラーを詳細表示
+  */
+
+  if (!response.ok) {
+
+    const detail =
+      await response.text();
+
+    console.error(
+      "Worker error:",
+      response.status,
+      detail
+    );
 
     throw new Error(
-      "Workerへ接続できませんでした。ネットワーク・URL・CORSを確認してください。"
+      "HTTP " +
+      response.status +
+      ": " +
+      detail
     );
 
   }
 
 
   /*
-    HTTPレスポンスを
-    いったん文字列で受け取る
+    JSONとして読み込む
   */
 
-  const text=
-    await r.text();
+  const text =
+    await response.text();
 
 
-  /*
-    HTTPエラー
-  */
+  console.log(
+    "Worker response:",
+    text
+  );
 
-  if(!r.ok){
-
-    let detail=text;
-
-
-    try{
-
-      const j=
-        JSON.parse(text);
-
-      detail=
-        j.detail ||
-        j.error ||
-        text;
-
-    }catch(e){}
-
-
-    throw new Error(
-      `HTTP ${r.status}: ${detail}`
-    );
-
-  }
-
-
-  /*
-    JSONとして解析
-  */
 
   let data;
 
+  try {
 
-  try{
-
-    data=
+    data =
       JSON.parse(text);
 
-  }catch(e){
+  } catch {
 
     throw new Error(
-      "WorkerからJSONではない応答が返されました。"
+      "WorkerからJSONではない応答が返ってきました："
+      + text
     );
 
   }
 
 
   /*
-    correctがあるか確認
+    correctが存在するか確認
   */
 
-  if(
+  if (
     typeof data.correct !==
     "boolean"
-  ){
+  ) {
 
     throw new Error(
-      "Workerから正しい採点結果が返されませんでした。"
+      "AIから正しい採点結果が返されませんでした："
+      + JSON.stringify(data)
     );
 
   }
@@ -1866,35 +1776,32 @@ async function aiGrade(
 }
 
 
-/*
-  AI接続テスト
-*/
+/* =========================================================
+   AI接続テスト
+   ========================================================= */
 
-async function testAI(){
+async function testAI() {
 
-  const input=
+  const input =
     document.getElementById(
       "aiEndpoint"
     );
 
-  const status=
+  const status =
     document.getElementById(
       "aiStatus"
     );
 
 
   /*
-    入力欄が存在するか
+    入力欄が存在するか確認
   */
 
-  if(!input){
+  if (!input) {
 
-    if(status){
-
-      status.textContent=
-        "AI接続先の入力欄が見つかりません。";
-
-    }
+    console.error(
+      "aiEndpoint が見つかりません。"
+    );
 
     return;
 
@@ -1902,18 +1809,17 @@ async function testAI(){
 
 
   /*
-    現在の入力欄のURLを
-    必ず保存
+    まず現在入力されているURLを保存
   */
 
   saveAIEndpoint();
 
 
   /*
-    保存後にもう一度取得
+    保存したURLを読み直す
   */
 
-  const endpoint=
+  const endpoint =
     getAIEndpoint();
 
 
@@ -1924,12 +1830,12 @@ async function testAI(){
 
 
   /*
-    URLがない
+    URLがない場合
   */
 
-  if(!endpoint){
+  if (!endpoint) {
 
-    status.textContent=
+    status.textContent =
       "先にAI採点用WorkerのURLを入力してください。";
 
     return;
@@ -1937,18 +1843,27 @@ async function testAI(){
   }
 
 
-  status.textContent=
+  status.textContent =
     "接続テスト中…";
 
 
-  try{
+  try {
 
-    const x=
+    /*
+      テスト問題
+    */
+
+    const result =
       await aiGrade(
         {
-          q:"テスト：日本の首都は？",
-          a:"東京",
-          type:"text"
+          q:
+            "テスト：日本の首都は？",
+
+          a:
+            "東京",
+
+          type:
+            "text"
         },
 
         "東京です",
@@ -1957,39 +1872,1650 @@ async function testAI(){
       );
 
 
-    if(
-      x.correct===true
-    ){
+    /*
+      成功
+    */
 
-      status.textContent=
+    if (
+      typeof result.correct ===
+      "boolean"
+    ) {
+
+      status.textContent =
         "✅ 接続成功。AI採点を利用できます。";
 
-    }else{
+    } else {
 
-      status.textContent=
-        "⚠️ 接続はできましたが、テスト採点の結果を確認してください。";
+      status.textContent =
+        "⚠️ 接続はできましたが、AIの応答形式を確認してください。";
 
     }
 
 
-  }catch(e){
+  } catch (error) {
 
     console.error(
       "AI connection error:",
-      e
+      error
     );
 
 
-    status.textContent=
-      "❌ 接続エラー：" +
+    /*
+      今回はここを重要に変更。
+      原因を画面にも表示する。
+    */
+
+    status.textContent =
+      "❌ " +
       (
-        e.message ||
-        String(e)
+        error.message ||
+        String(error)
       );
 
   }
 
 }
+
+
+/* =========================================================
+   ページ読み込み時
+   ========================================================= */
+
+function loadAIEndpoint() {
+
+  const input =
+    document.getElementById(
+      "aiEndpoint"
+    );
+
+
+  if (!input) {
+    return;
+  }
+
+
+  const saved =
+    getAIEndpoint();
+
+
+  if (saved) {
+
+    input.value =
+      saved;
+
+  }
+
+}
+
+
+/* =========================================================
+   ここから問題データ
+   ========================================================= */
+
+
+/*
+  ここには現在使っているQ = [...]を
+  そのまま入れてください。
+
+  例：
+
+const Q = [
+
+  {
+    q:"世界恐慌は何年？",
+    a:"1929年",
+    type:"text",
+    keys:[
+      ["1929","1929年"]
+    ]
+  },
+
+  {
+    q:"第一次世界大戦が始まった年は？",
+    a:"1914年",
+    type:"choice",
+    choices:[
+      "1914年",
+      "1918年",
+      "1929年",
+      "1939年"
+    ],
+    correct:0
+  }
+
+];
+*/
+
+
+/* =========================================================
+   問題数表示
+   ========================================================= */
+
+document.getElementById(
+  "countPill"
+).textContent =
+  "問題数：" + Q.length;
+
+
+/* =========================================================
+   ゲーム変数
+   ========================================================= */
+
+let deck = [];
+
+let deckPos = 0;
+
+let current = null;
+
+let answered = false;
+
+let selected = null;
+
+let totalAnswered = 0;
+
+let score = 0;
+
+let correctCount = 0;
+
+let wrongCount = 0;
+
+let reviewList = [];
+
+
+/* =========================================================
+   文字列正規化
+   ========================================================= */
+
+function norm(value) {
+
+  return String(
+    value ?? ""
+  )
+    .toLowerCase()
+    .replace(
+      /[！!？?。、，,・･「」『』（）()\[\]［］：:；;]/g,
+      ""
+    )
+    .replace(
+      /\s+/g,
+      ""
+    )
+    .replace(
+      /アメリカ合衆国/g,
+      "アメリカ"
+    )
+    .replace(
+      /イギリス連邦/g,
+      "イギリス"
+    );
+
+}
+
+
+/* =========================================================
+   シャッフル
+   ========================================================= */
+
+function shuffle(array) {
+
+  return [
+    ...array
+  ].sort(
+    () =>
+      Math.random() - 0.5
+  );
+
+}
+
+
+/* =========================================================
+   問題デッキ作成
+   ========================================================= */
+
+function makeDeck() {
+
+  deck =
+    shuffle(Q);
+
+  deckPos =
+    0;
+
+}
+
+
+/* =========================================================
+   次の問題を取得
+   ========================================================= */
+
+function drawQuestion() {
+
+  if (
+    deck.length === 0 ||
+    deckPos >= deck.length
+  ) {
+
+    const previous =
+      current;
+
+    makeDeck();
+
+
+    /*
+      同じ問題が連続しないようにする
+    */
+
+    if (
+      previous &&
+      deck.length > 1 &&
+      deck[0] === previous
+    ) {
+
+      [
+        deck[0],
+        deck[1]
+      ] =
+      [
+        deck[1],
+        deck[0]
+      ];
+
+    }
+
+  }
+
+
+  return deck[
+    deckPos++
+  ];
+
+}
+
+
+/* =========================================================
+   ゲーム開始
+   ========================================================= */
+
+function startGame() {
+
+  totalAnswered = 0;
+
+  score = 0;
+
+  correctCount = 0;
+
+  wrongCount = 0;
+
+  reviewList = [];
+
+  answered = false;
+
+  selected = null;
+
+
+  makeDeck();
+
+
+  document
+    .getElementById("home")
+    .classList
+    .add("hidden");
+
+
+  document
+    .getElementById("result")
+    .classList
+    .add("hidden");
+
+
+  document
+    .getElementById("game")
+    .classList
+    .remove("hidden");
+
+
+  renderNextQuestion();
+
+}
+
+
+/* =========================================================
+   問題表示
+   ========================================================= */
+
+function renderNextQuestion() {
+
+  current =
+    drawQuestion();
+
+  render();
+
+}
+
+
+function render() {
+
+  const x =
+    current;
+
+
+  document.getElementById(
+    "qnum"
+  ).textContent =
+    `第 ${totalAnswered + 1} 問　｜　正解 ${correctCount}　不正解 ${wrongCount}`;
+
+
+  document.getElementById(
+    "bar"
+  ).style.width =
+    (
+      deckPos /
+      deck.length *
+      100
+    ) + "%";
+
+
+  document.getElementById(
+    "question"
+  ).textContent =
+    x.q;
+
+
+  const area =
+    document.getElementById(
+      "answerArea"
+    );
+
+
+  area.innerHTML =
+    "";
+
+
+  selected =
+    null;
+
+  answered =
+    false;
+
+
+  document.getElementById(
+    "feedback"
+  ).className =
+    "hidden";
+
+
+  document.getElementById(
+    "submitBtn"
+  ).textContent =
+    "回答する";
+
+
+  document.getElementById(
+    "submitBtn"
+  ).disabled =
+    false;
+
+
+  /*
+    選択問題
+  */
+
+  if (
+    x.type === "choice"
+  ) {
+
+    const grid =
+      document.createElement(
+        "div"
+      );
+
+    grid.className =
+      "optionGrid";
+
+
+    shuffle(
+      x.choices.map(
+        (value,index) => ({
+          value,
+          index
+        })
+      )
+    )
+    .forEach(
+      option => {
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+
+        button.className =
+          "option";
+
+
+        button.textContent =
+          option.value;
+
+
+        button.onclick =
+          () => {
+
+            if (answered) {
+              return;
+            }
+
+
+            selected =
+              option.index;
+
+
+            [
+              ...grid.children
+            ]
+              .forEach(
+                element =>
+                  element.classList
+                    .remove(
+                      "selected"
+                    )
+              );
+
+
+            button.classList
+              .add(
+                "selected"
+              );
+
+          };
+
+
+        grid.appendChild(
+          button
+        );
+
+      }
+    );
+
+
+    area.appendChild(
+      grid
+    );
+
+
+    return;
+  }
+
+
+  /*
+    正誤問題
+  */
+
+  if (
+    x.type === "bool"
+  ) {
+
+    const grid =
+      document.createElement(
+        "div"
+      );
+
+    grid.className =
+      "optionGrid";
+
+
+    [
+      "はい",
+      "いいえ"
+    ]
+      .forEach(
+        (value,index) => {
+
+          const button =
+            document.createElement(
+              "button"
+            );
+
+
+          button.className =
+            "option";
+
+
+          button.textContent =
+            value;
+
+
+          button.onclick =
+            () => {
+
+              if (answered) {
+                return;
+              }
+
+
+              selected =
+                index === 0;
+
+
+              [
+                ...grid.children
+              ]
+                .forEach(
+                  element =>
+                    element.classList
+                      .remove(
+                        "selected"
+                      )
+                );
+
+
+              button.classList
+                .add(
+                  "selected"
+                );
+
+            };
+
+
+          grid.appendChild(
+            button
+          );
+
+        }
+      );
+
+
+    area.appendChild(
+      grid
+    );
+
+
+    return;
+  }
+
+
+  /*
+    並べ替え問題
+  */
+
+  if (
+    x.type === "order"
+  ) {
+
+    const grid =
+      document.createElement(
+        "div"
+      );
+
+    grid.className =
+      "optionGrid";
+
+
+    selected =
+      [];
+
+
+    shuffle(
+      x.items
+    )
+      .forEach(
+        value => {
+
+          const button =
+            document.createElement(
+              "button"
+            );
+
+
+          button.className =
+            "option";
+
+
+          button.dataset.value =
+            value;
+
+
+          button.textContent =
+            value;
+
+
+          button.onclick =
+            () => {
+
+              if (answered) {
+                return;
+              }
+
+
+              if (
+                selected.includes(
+                  value
+                )
+              ) {
+
+                selected =
+                  selected.filter(
+                    item =>
+                      item !== value
+                  );
+
+                button.classList
+                  .remove(
+                    "selected"
+                  );
+
+              } else {
+
+                selected.push(
+                  value
+                );
+
+                button.classList
+                  .add(
+                    "selected"
+                  );
+
+              }
+
+
+              [
+                ...grid.children
+              ]
+                .forEach(
+                  element => {
+
+                    const item =
+                      element.dataset.value;
+
+                    const index =
+                      selected.indexOf(
+                        item
+                      );
+
+
+                    element.textContent =
+                      index >= 0
+                        ? `${index + 1}：${item}`
+                        : item;
+
+                  }
+                );
+
+            };
+
+
+          grid.appendChild(
+            button
+          );
+
+        }
+      );
+
+
+    area.appendChild(
+      grid
+    );
+
+
+    return;
+  }
+
+
+  /*
+    記述問題
+  */
+
+  const textarea =
+    document.createElement(
+      "textarea"
+    );
+
+
+  textarea.className =
+    "answerBox";
+
+
+  textarea.id =
+    "textAnswer";
+
+
+  textarea.placeholder =
+    "ここに答えを入力…";
+
+
+  area.appendChild(
+    textarea
+  );
+
+}
+
+
+/* =========================================================
+   回答を文字列化
+   ========================================================= */
+
+function answerToText(
+  question,
+  answer
+) {
+
+  if (
+    question.type ===
+    "choice"
+  ) {
+
+    return (
+      answer === null ||
+      answer === undefined
+    )
+      ? "（未回答）"
+      : question.choices[
+          answer
+        ];
+
+  }
+
+
+  if (
+    question.type ===
+    "bool"
+  ) {
+
+    return (
+      answer === null ||
+      answer === undefined
+    )
+      ? "（未回答）"
+      : answer
+        ? "はい"
+        : "いいえ";
+
+  }
+
+
+  if (
+    question.type ===
+    "order"
+  ) {
+
+    return Array.isArray(
+      answer
+    )
+      ? answer.join(" → ")
+      : "（未回答）";
+
+  }
+
+
+  return String(
+    answer ?? ""
+  )
+    .trim() ||
+    "（未回答）";
+
+}
+
+
+/* =========================================================
+   ローカル自動判定
+   ========================================================= */
+
+function judgeLocal(
+  question,
+  answer
+) {
+
+  if (
+    question.type ===
+    "choice"
+  ) {
+
+    return (
+      answer ===
+      question.correct
+    );
+
+  }
+
+
+  if (
+    question.type ===
+    "bool"
+  ) {
+
+    return (
+      answer ===
+      question.answer
+    );
+
+  }
+
+
+  if (
+    question.type ===
+    "order"
+  ) {
+
+    return (
+      Array.isArray(answer) &&
+      answer.join("|") ===
+      question.items.join("|")
+    );
+
+  }
+
+
+  const text =
+    norm(answer);
+
+
+  if (!text) {
+    return false;
+  }
+
+
+  if (
+    norm(question.a) ===
+    text
+  ) {
+
+    return true;
+
+  }
+
+
+  if (
+    norm(question.a)
+      .includes(text) &&
+    text.length >= 4
+  ) {
+
+    return true;
+
+  }
+
+
+  if (
+    !question.keys
+  ) {
+
+    return false;
+
+  }
+
+
+  let hit = 0;
+
+
+  for (
+    const group
+    of question.keys
+  ) {
+
+    if (
+      group.some(
+        keyword =>
+          text.includes(
+            norm(keyword)
+          )
+      )
+    ) {
+
+      hit++;
+
+    }
+
+  }
+
+
+  const ratio =
+    hit /
+    question.keys.length;
+
+
+  if (
+    question.keys.length <= 2
+  ) {
+
+    return (
+      hit ===
+      question.keys.length
+    );
+
+  }
+
+
+  return (
+    ratio >= 0.7 &&
+    hit >= 3
+  );
+
+}
+
+
+/* =========================================================
+   HTMLエスケープ
+   ========================================================= */
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value
+  )
+    .replace(
+      /[&<>"']/g,
+      character =>
+        ({
+          "&":
+            "&amp;",
+
+          "<":
+            "&lt;",
+
+          ">":
+            "&gt;",
+
+          "\"":
+            "&quot;",
+
+          "'":
+            "&#039;"
+        })[
+          character
+        ]
+    );
+
+}
+
+
+/* =========================================================
+   ローカル解説
+   ========================================================= */
+
+function makeLocalExplanation(
+  question,
+  studentAnswer
+) {
+
+  if (
+    !studentAnswer ||
+    studentAnswer ===
+      "（未回答）"
+  ) {
+
+    return (
+      `今回は回答がありません。` +
+      `正解は「${question.a}」です。` +
+      `模範解答の重要語を確認しましょう。`
+    );
+
+  }
+
+
+  if (
+    question.type ===
+      "choice" ||
+    question.type ===
+      "bool" ||
+    question.type ===
+      "order"
+  ) {
+
+    return (
+      `正しい答えは「${question.a}」です。` +
+      `あなたの回答「${studentAnswer}」と` +
+      `比べて確認しましょう。`
+    );
+
+  }
+
+
+  if (
+    question.keys &&
+    question.keys.length
+  ) {
+
+    const missing =
+      question.keys
+        .map(
+          group =>
+            group[0]
+        )
+        .filter(
+          keyword =>
+            !norm(
+              studentAnswer
+            ).includes(
+              norm(keyword)
+            )
+        );
+
+
+    if (
+      missing.length
+    ) {
+
+      return (
+        `模範解答は「${question.a}」です。` +
+        `回答では、` +
+        `${missing
+          .slice(0,3)
+          .join("・")}` +
+        `などの重要語が不足している可能性があります。`
+      );
+
+    }
+
+  }
+
+
+  return (
+    `模範解答は「${question.a}」です。` +
+    `あなたの回答と見比べて、` +
+    `意味・重要語・条件の抜けを確認しましょう。`
+  );
+
+}
+
+
+/* =========================================================
+   回答
+   ========================================================= */
+
+async function submitAnswer() {
+
+  if (answered) {
+
+    nextQuestion();
+
+    return;
+
+  }
+
+
+  const question =
+    current;
+
+
+  let answer;
+
+
+  if (
+    question.type ===
+      "choice" ||
+    question.type ===
+      "bool"
+  ) {
+
+    answer =
+      selected;
+
+  } else if (
+    question.type ===
+    "order"
+  ) {
+
+    answer =
+      selected || [];
+
+  } else {
+
+    const textarea =
+      document.getElementById(
+        "textAnswer"
+      );
+
+    answer =
+      textarea
+        ? textarea.value
+        : "";
+
+  }
+
+
+  const studentText =
+    answerToText(
+      question,
+      answer
+    );
+
+
+  let correct =
+    judgeLocal(
+      question,
+      answer
+    );
+
+
+  let explanation =
+    "";
+
+  let usedAI =
+    false;
+
+  let aiError =
+    false;
+
+
+  const submitButton =
+    document.getElementById(
+      "submitBtn"
+    );
+
+
+  submitButton.disabled =
+    true;
+
+
+  submitButton.textContent =
+    "AIが採点中…";
+
+
+  /*
+    AI採点
+  */
+
+  if (
+    aiEnabled &&
+    getAIEndpoint()
+  ) {
+
+    try {
+
+      const result =
+        await aiGrade(
+          question,
+          studentText,
+          false
+        );
+
+
+      if (
+        typeof result.correct ===
+        "boolean"
+      ) {
+
+        correct =
+          result.correct;
+
+      }
+
+
+      explanation =
+        result.explanation ||
+        "";
+
+
+      usedAI =
+        true;
+
+
+    } catch (error) {
+
+      console.error(
+        "AI grading error:",
+        error
+      );
+
+      aiError =
+        true;
+
+    }
+
+  }
+
+
+  answered =
+    true;
+
+
+  totalAnswered++;
+
+
+  if (correct) {
+
+    score++;
+
+    correctCount++;
+
+  } else {
+
+    wrongCount++;
+
+
+    reviewList.push({
+      x:
+        question,
+
+      ans:
+        studentText,
+
+      explanation:
+        explanation
+
+    });
+
+  }
+
+
+  /*
+    AI解説がない場合
+  */
+
+  if (
+    !correct &&
+    !explanation
+  ) {
+
+    explanation =
+      makeLocalExplanation(
+        question,
+        studentText
+      );
+
+
+    if (
+      reviewList.length
+    ) {
+
+      reviewList[
+        reviewList.length - 1
+      ].explanation =
+        explanation;
+
+    }
+
+  }
+
+
+  /*
+    フィードバック
+  */
+
+  const feedback =
+    document.getElementById(
+      "feedback"
+    );
+
+
+  feedback.className =
+    "feedback " +
+    (
+      correct
+        ? "ok"
+        : "ng"
+    );
+
+
+  let html =
+    correct
+      ? "<b>正解！</b>"
+      : "<b>不正解</b>";
+
+
+  html +=
+    `<div style="margin-top:7px">
+      <span class="small">
+        模範解答
+      </span>
+      <br>
+      <span class="answer">
+        ${escapeHtml(question.a)}
+      </span>
+    </div>`;
+
+
+  html +=
+    `<div style="margin-top:9px">
+      <span class="small">
+        あなたの回答
+      </span>
+      <br>
+      ${escapeHtml(studentText)}
+    </div>`;
+
+
+  if (!correct) {
+
+    html +=
+      `<div style="
+        margin-top:12px;
+        padding:11px;
+        background:#fff;
+        border-radius:10px
+      ">
+        <b>📖 解説</b>
+        <br>
+        ${escapeHtml(explanation)}
+      </div>`;
+
+  }
+
+
+  if (usedAI) {
+
+    html +=
+      `<div class="small"
+        style="margin-top:8px">
+        🤖 AI採点を使用しました。
+      </div>`;
+
+  } else if (aiError) {
+
+    html +=
+      `<div class="small"
+        style="margin-top:8px">
+        AIに接続できなかったため、
+        自動判定を使用しました。
+      </div>`;
+
+  } else {
+
+    html +=
+      `<div class="small"
+        style="margin-top:8px">
+        AI接続先が未設定のため、
+        自動判定を使用しました。
+      </div>`;
+
+  }
+
+
+  feedback.innerHTML =
+    html;
+
+
+  submitButton.disabled =
+    false;
+
+
+  submitButton.textContent =
+    "次の問題";
+
+}
+
+
+/* =========================================================
+   スキップ
+   ========================================================= */
+
+function skipQuestion() {
+
+  if (answered) {
+
+    renderNextQuestion();
+
+    return;
+
+  }
+
+
+  const question =
+    current;
+
+
+  const explanation =
+    makeLocalExplanation(
+      question,
+      "（解答を表示）"
+    );
+
+
+  answered =
+    true;
+
+
+  totalAnswered++;
+
+  wrongCount++;
+
+
+  reviewList.push({
+    x:
+      question,
+
+    ans:
+      "（解答を表示）",
+
+    explanation:
+      explanation
+  });
+
+
+  const feedback =
+    document.getElementById(
+      "feedback"
+    );
+
+
+  feedback.className =
+    "feedback ng";
+
+
+  feedback.innerHTML =
+    `<b>解答を表示します</b>
+
+    <div style="margin-top:7px">
+      <span class="small">
+        模範解答
+      </span>
+      <br>
+      <span class="answer">
+        ${escapeHtml(question.a)}
+      </span>
+    </div>
+
+    <div style="
+      margin-top:12px;
+      padding:11px;
+      background:#fff;
+      border-radius:10px
+    ">
+      <b>📖 解説</b>
+      <br>
+      ${escapeHtml(explanation)}
+    </div>`;
+
+
+  document.getElementById(
+    "submitBtn"
+  ).disabled =
+    false;
+
+
+  document.getElementById(
+    "submitBtn"
+  ).textContent =
+    "次の問題";
+
+}
+
+
+/* =========================================================
+   次の問題
+   ========================================================= */
+
+function nextQuestion() {
+
+  if (!answered) {
+    return;
+  }
+
+  renderNextQuestion();
+
+}
+
+
+/* =========================================================
+   結果画面
+   ========================================================= */
+
+function finishGame() {
+
+  if (
+    totalAnswered === 0
+  ) {
+
+    goHome();
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("game")
+    .classList
+    .add("hidden");
+
+
+  document
+    .getElementById("result")
+    .classList
+    .remove("hidden");
+
+
+  const rate =
+    totalAnswered
+      ? score /
+        totalAnswered
+      : 0;
+
+
+  document.getElementById(
+    "score"
+  ).textContent =
+    `${score} / ${totalAnswered}`;
+
+
+  document.getElementById(
+    "resultText"
+  ).textContent =
+    totalAnswered === 0
+      ? "まだ回答していません。"
+      : rate === 1
+        ? "全問正解！"
+        : rate >= 0.8
+          ? "かなり仕上がっています。"
+          : "間違えた問題を復習して、もう一周！";
+
+}
+
+
+/* =========================================================
+   復習
+   ========================================================= */
+
+function showReview() {
+
+  const review =
+    document.getElementById(
+      "review"
+    );
+
+
+  review.classList.toggle(
+    "hidden"
+  );
+
+
+  if (
+    !reviewList.length
+  ) {
+
+    review.innerHTML =
+      "<p>間違えた問題はありません！</p>";
+
+    return;
+
+  }
+
+
+  review.innerHTML =
+    reviewList
+      .map(
+        (item,index) =>
+
+          `<div class="reviewItem">
+
+            <span class="tag">
+              復習 ${index + 1}
+            </span>
+
+            <b>
+              ${escapeHtml(
+                item.x.q
+              )}
+            </b>
+
+            <div style="margin-top:7px">
+              あなたの回答：
+              ${escapeHtml(
+                item.ans
+              )}
+            </div>
+
+            <div style="margin-top:5px">
+              模範解答：
+              <b>
+                ${escapeHtml(
+                  item.x.a
+                )}
+              </b>
+            </div>
+
+            <div style="margin-top:7px">
+              <b>解説：</b>
+              ${escapeHtml(
+                item.explanation ||
+                makeLocalExplanation(
+                  item.x,
+                  item.ans
+                )
+              )}
+            </div>
+
+          </div>`
+      )
+      .join("");
+
+}
+
+
+/* =========================================================
+   ホーム
+   ========================================================= */
+
+function goHome() {
+
+  document
+    .getElementById("home")
+    .classList
+    .remove("hidden");
+
+
+  document
+    .getElementById("game")
+    .classList
+    .add("hidden");
+
+
+  document
+    .getElementById("result")
+    .classList
+    .add("hidden");
+
+}
+
+
+/* =========================================================
+   起動
+   ========================================================= */
+
+loadAIEndpoint();
+
+</script>
 
 
 /*
